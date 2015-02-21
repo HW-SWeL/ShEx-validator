@@ -14,9 +14,14 @@ npm install
 
 
 ## Usage
-Currently can only run on command line and only parses with no validation.
+Currently can only run on command line and the validation is borked (it throws errors)
+If you are in the module dir then run
 ```sh
-node ShEx-validator /tests/test.shex /tests/test.turtle
+node ShEx-validator tests/test.shex tests/test.turtle
+```
+Otherwise it is run like a standard node module
+```sh
+node ShEx-validator <schema> <data>
 ```
 
 ## Tests
