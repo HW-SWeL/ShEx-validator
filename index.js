@@ -33,11 +33,11 @@ function validate(schemaText, dataText, callbacks, options) {
 module.exports.validate = validate;
 
 if (process.argv.length == 4) {
-    var schema = readFile(__dirname + process.argv[2])
+    var schema = readFile(process.argv[2])
         .then(function (text) {
             return text.toString();
         });
-    var data = readFile(__dirname + process.argv[3])
+    var data = readFile(process.argv[3])
         .then(function (text) {
             return text.toString();
         });
