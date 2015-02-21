@@ -1,6 +1,6 @@
 #BASE <http://base.example/#>
 PREFIX ex: <http://ex.example/#>
-PREFIX foaf: <http://foaf.example/#>
+PREFIX foaf: <http://xmlns.com/foaf/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 <Issue1>
@@ -24,3 +24,4 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     foaf:phone <tel:+456> ;
     foaf:mbox <mailto:joe@example.org>
 .
+

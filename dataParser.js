@@ -6,6 +6,12 @@ exports.parseData = function parseData(dataText) {
     return parseWithN3(dataText);
 };
 
+function parseNode(text) {
+    if(text.indexOf("^^") > -1) return RDF.RDFLiteral(text, undefined, "<http://www.w3.org/2001/XMLSchema#dateTime>");
+    else if(text.substr(0, 1) == "\"") return RDF.RDFLiteral(text);
+    else return RDF.IRI(text);
+}
+
 
 function parseWithN3(dataText) {
     var n3 = require('n3');
@@ -18,9 +24,9 @@ function parseWithN3(dataText) {
             if (error) reject(error);
             else if (triple) {
                 triple = RDF.Triple(
-                    RDF.IRI(triple.subject, RDF.Position0()),
-                    RDF.IRI(triple.predicate, RDF.Position0()),
-                    RDF.IRI(triple.object, RDF.Position0())
+                    parseNode(triple.subject),
+                    parseNode(triple.predicate),
+                    parseNode(triple.object)
                 );
 
                 db.push(triple);

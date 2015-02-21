@@ -474,11 +474,63 @@ RDF = {
 
     Dataset: function () {
         return {
+            // test with RDF.Dataset().test()
+            test: function (info, warning, error) {
+                info = info || function (s) { console.log("info: "+s); }
+                warning = warning || function (s) { console.log("warning: "+s); }
+                error = error || function (s) { console.log("error: "+s); }
+                var errors = 0;
+                var t0 = RDF.Triple(RDF.IRI  ("Bob"), RDF.IRI("http://...foaf/knows"),  RDF.IRI       ("Joe"));
+                var t1 = RDF.Triple(RDF.IRI  ("Bob"), RDF.IRI("http://...foaf/knows"),  RDF.BNode     ("sue"));
+                var t2 = RDF.Triple(RDF.BNode("Sue"), RDF.IRI("http://...foaf/knows"),  RDF.IRI       ("Bob"));
+                var t3 = RDF.Triple(RDF.IRI  ("Bob"), RDF.IRI("http://...foaf/name" ),  RDF.RDFLiteral("Bob"));
+                var t4 = RDF.Triple(RDF.IRI  ("Bob"), RDF.IRI("http://...foaf/name" ),  RDF.RDFLiteral("Rob"));
+
+                var ds = RDF.Dataset();
+                ds.unordered();
+                ds.push(t0);ds.push(t1);ds.push(t2);ds.push(t3);ds.push(t4); info(ds.toString());
+                info("- " + t1.toString()); ds.retract(t1); info(ds.toString());
+                info("- " + t4.toString()); ds.retract(t4); info(ds.toString());
+                info("- " + t3.toString()); ds.retract(t3); info(ds.toString());
+                info("- " + t2.toString()); ds.retract(t2); info(ds.toString());
+                info("- " + t0.toString()); ds.retract(t0); info(ds.toString());
+                try {
+                    info("- " + t2.toString()); ds.retract(t2); info(ds.toString());
+                    error("expected to fail removal of t2.");
+                    ++errors;
+                } catch (e) {
+                    // expected path
+                }
+                return errors;
+            },
             _: 'Dataset',
+            /* triples is a simple array of Triple objects, here abbreviated {str:"s p o"}:
+             [{str:"<Bob> <foaf:knows> <Joe>"},
+             {str:"<Bob> <foaf:knows> _:sue"},
+             {str:"_:Sue <foaf:knows> <Bob>"},
+             {str:"<Bob> <foaf:name>  'Bob'"},
+             {str:"<Bob> <foaf:name>  'Rob'"}]
+             */
             triples: [],
             comments: [],
+            /* SPO is an index of the form:
+             { "<Bob>": { "<foaf:name>" :  { "'Bob'": [{str:"<Bob> <foaf:name>  'Bob'"}, 3],
+             "'Rob'": [{str:"<Bob> <foaf:name>  'Rob'"}, 4]},
+             "<foaf:knows>":  { "<Joe>": [{str:"<Bob> <foaf:knows> <Joe>"}, 0],
+             "_:sue": [{str:"<Bob> <foaf:knows> _:sue"}, 1]} },
+             "_:Sue": { "<foaf:knows>": { "<Bob>": [{str:"_:Sue <foaf:knows> <Bob>"}, 2]} } }
+             */
             SPO: {},
             indexEntries: [],
+            unordered: function () {
+                this.triples = null;
+            },
+            clear: function () {
+                this.triples = [];
+                this.comments = [];
+                this.SPO = {};
+                this.indexEntries = [];
+            },
             triplesMatching: function (s, p, o) {
                 var ret = [];
                 var sStr = s ? s.toString() : '', pStr = p ? p.toString() : '', oStr = o ? o.toString() : '';
@@ -516,13 +568,6 @@ RDF = {
                     }
                 }
                 ss(this.SPO);
-                //            for (var i = 0; i < this.triples.length; ++i) {
-                //                var t = this.triples[i];
-                //                if ((s === null || s === undefined || s.lex == t.s.lex && s._ == t.s._) &&
-                //                    (p === null || p === undefined || p.lex == t.p.lex && p._ == t.p._) &&
-                //                    (o === null || o === undefined || o.lex == t.o.lex && o._ == t.o._))
-                //                    ret.push(t);
-                //            }
                 return ret;
             },
             triplesMatching_str: function (s, p, o) {
@@ -537,30 +582,34 @@ RDF = {
                 return ret;
             },
             length: function () {
-                return this.triples.length;
+                return this.triples === null ? -1 : this.triples.length;
             },
             uniqueSubjects: function () {
-                var ret = [];
-                var subjects = {};
-                for (var i = 0; i < this.triples.length; ++i) {
-                    var t = this.slice(i)[0].s;
-                    var s = t.toString();
-                    if (subjects[s] === undefined) {
-                        subjects[s] = t;
-                        ret.push(t);
-                    }
-                }
-                return ret;
+                return Object.keys(this.SPO);
             },
             slice: function (from, length) {
+                if (this.triples === null)
+                    throw "Dataset.slice not available in unordered mode.";
                 return this.triples.slice(from, length);
             },
             clone: function () {
                 var ret = RDF.Dataset();
-                ret.triples = this.triples.slice();
+                for (si in this.SPO) {
+                    ret.SPO[si] = {};
+                    for (pi in this.SPO[si]) {
+                        ret.SPO[si][pi] = {};
+                        for (oi in this.SPO[si][pi]) {
+                            ret.SPO[si][pi][oi] = [ret.SPO[si][pi][oi][0], ret.SPO[si][pi][oi][1]];
+                        }
+                    }
+                }
+                if (this.triples !== null)
+                    ret.triples = this.triples.slice();
                 return ret;
             },
             splice: function (from, length) {
+                if (this.triples === null)
+                    throw "Dataset.splice not available in unordered mode.";
                 return this.triples.splice(from, length);
             },
             index: function (t, at) {
@@ -572,38 +621,102 @@ RDF = {
                     PO[pStr] = {};
                 var O = PO[pStr];
                 var entry = [t, at];
-                var len = this.indexEntries.length;
-                if (at < len)
-                    for (var i = at; i < len; ++i) {
-                        this.indexEntries[i+1] = this.indexEntries[i];
-                        this.indexEntries[i+1][1] = i+1;
-                    }
+                if (this.triples) { // not in unordered mode
+                    var len = this.indexEntries.length;
+                    if (at < len)
+                        for (var i = at; i < len; ++i) {
+                            this.indexEntries[i+1] = this.indexEntries[i];
+                            this.indexEntries[i+1][1] = i+1;
+                        }
+                }
                 O[oStr] = entry;
             },
             push: function (t) {
                 if (this.triplesMatching(t.s, t.p, t.o).length === 0) {
-                    this.triples.push(t);
-                    this.index(t, this.triples.length);
+                    if (this.triples !== null) {
+                        this.triples.push(t);
+                        this.index(t, this.triples.length);
+                    } else {
+                        this.index(t, -1);
+                    }
                 }
             },
             insertAt: function (offset, t) {
+                if (this.triples === null)
+                    throw "Dataset.insertAt not available in unordered mode.";
                 if (this.triplesMatching(t.s, t.p, t.o).length === 0) {
                     this.triples.splice(offset, 0, t);
                     this.index(t, offset);
                 }
+            },
+            retract: function (t) {
+                var sStr = t.s ? t.s.toString() : '';
+                var pStr = t.p ? t.p.toString() : '';
+                var oStr = t.o ? t.o.toString() : '';
+                function os (O) {
+                    if (t.o) {
+                        if (!(oStr in O))
+                            throw "object not found: " + t.toString();
+                        delete O[oStr];
+                    } else {
+                        for (var oi in O)
+                            delete(O[oi]);
+                    }
+                    return Object.keys(O).length == 0;
+                }
+                function ps (PO) {
+                    if (t.p) {
+                        if (!(pStr in PO))
+                            throw "predicate not found: " + t.toString();
+                        if (os(PO[pStr]))
+                            delete PO[pStr];
+                    } else {
+                        for (var pi in PO)
+                            if (os(PO[pi]))
+                                delete PO[pi];
+                    }
+                    return Object.keys(PO).length == 0
+                }
+                function ss (SPO) {
+                    if (t.s) {
+                        if (!(sStr in SPO))
+                            throw "subject not found: " + t.toString();
+                        if (ps(SPO[sStr]))
+                            delete SPO[sStr];
+                    } else {
+                        for (var si in SPO)
+                            if (ps(SPO[si]))
+                                delete SPO[si];
+                    }
+                }
+                ss(this.SPO);
             },
             addComment: function (c) {
                 this.comments.push(c);
             },
 
             toString: function () {
-                return this.triples.map(function (t) { return t.toString(); }).join("\n");
+                if (this.triples === null) {
+                    var ret = [];
+                    for (si in this.SPO)
+                        for (pi in this.SPO[si])
+                            for (oi in this.SPO[si][pi])
+                                ret.push(this.SPO[si][pi][oi][0].toString());
+                    return ret.join("\n");
+                } else
+                    return this.triples.map(function (t) { return t.toString(); }).join("\n");
             },
             colorize: function (charmap) {
                 var idMap = IntStringMap();
                 var termStringToIds = StringIdMap();
-                for (var iTriple = 0; iTriple < this.triples.length; ++iTriple)
-                    this.triples[iTriple].colorize(charmap, idMap, termStringToIds);
+                if (this.triples === null)
+                    for (si in this.SPO)
+                        for (pi in this.SPO[si])
+                            for (oi in this.SPO[si][pi])
+                                this.SPO[si][pi][oi][0].colorize(charmap, idMap, termStringToIds);
+                else
+                    for (var iTriple = 0; iTriple < this.triples.length; ++iTriple)
+                        this.triples[iTriple].colorize(charmap, idMap, termStringToIds);
                 var commentId = "tc";
                 //this.label.assignId(charmap, ruleId+"_s"); // @@ could idMap.addMember(...), but result is more noisy
                 for (var iComment = 0; iComment < this.comments.length; ++iComment) {
@@ -616,6 +729,47 @@ RDF = {
         };
     },
 
+    makeSPARQLInterface: function (url, constructorParms) {
+        var separator = url.match(/\?/) ? ';' : '?';
+        var defaultParms = $.extend({
+            type: 'GET',
+            dataType: "text"
+            //contentType: 'text/plain',{turtle,shex}
+        }, constructorParms);
+        var lastQuery = null;
+        var done = function () {};
+        var fail = function (jqXHR, textStatus, errorThrown) {
+            throw "unable to query " + url + "\n" + textStatus + "\n" + errorThrown;
+        };
+        var always = function () {};
+        return {
+            execute: function (query, parms) {
+                lastQuery = query;
+                if ("done" in parms) { // suck in old-style controls -- needed for synchronous execution.
+                    this.done(parms.done); // set the new done
+                    delete parms.done;
+                }
+                var merge = $.extend({
+                    url: url + separator + "query=" + encodeURIComponent(query)
+                }, parms);
+                $.ajax(merge).done(function (body, textStatus, jqXHR) {
+                    // Crappy mime parser doesn't handle quoted-string
+                    //  c.f. http://tools.ietf.org/html/rfc7230#section-3.2.6
+                    var ray = jqXHR.getResponseHeader("content-type").split(/;/)
+                        .map(function (s) { return s.replace(/ /g,''); });
+                    var r = RDF.parseSPARQLResults(body, ray.shift(), ray);
+                    done(r);
+                }).fail(fail).always(always);
+                return this;
+            },
+            getURL: function () { return url; },
+            getLastQuery: function () { return lastQuery; },
+            done: function (newDone) { done = newDone; return this; },
+            fail: function (newFail) { fail = newFail; return this; },
+            always: function (newAlways) { always = newAlways; return this; }
+        };
+    },
+
     // parseSPARQLResults("<...>"|"{...}", "application/sparql-results+json"|"xml", ["charset=UTF-8"])
     //   parameters is ignored.
     // returns:
@@ -623,7 +777,7 @@ RDF = {
     parseSPARQLResults: function (body, mediaType, parameters) {
         var ret = { vars: [], solutions: [] };
         if (mediaType === "application/sparql-results+xml") {
-            var xml = $($.parseXML(body));
+            var xml = $(typeof body === "object" ? body : $.parseXML(body));
             return {
                 vars: xml.find("head variable").get().map(function (obj) {
                     return obj.getAttribute("name");
@@ -646,14 +800,14 @@ RDF = {
                                 datatype = RDF.IRI(datatype, pos);
                             ret[varName] = RDF.RDFLiteral(content, langTag, datatype, pos);
                         } else {
-                            "unknown element name: \"" + elt.localName + "\"";
+                            "unknown node type: \"" + elt.localName + "\"";
                         }
                     });
                     return ret;
                 })
             };
         } else if (mediaType === "application/sparql-results+json") {
-            var x = jQuery.parseJSON(body);
+            var x = $(typeof body === "object" ? body : jQuery.parseJSON(body));
             return {
                 vars: x.head.vars,
                 solutions: x.results.bindings.map(function (result, solnNo) {
@@ -675,15 +829,103 @@ RDF = {
                                 datatype = RDF.IRI(binding.datatype, pos);
                             ret[varName] = RDF.RDFLiteral(binding.value, langTag, datatype, pos);
                         } else {
-                            "unknown element name: \"" + binding.type + "\"";
+                            "unknown node type: \"" + binding.type + "\"";
                         }
                     }
                     return ret;
                 })
             };
+        } else if (mediaType === "text/turtle") {
+            var queryIriResolver = RDF.createIRIResolver();
+            return {obj: TurtleParser.parse(body, {iriResolver: queryIriResolver}),
+                iriResolver: queryIriResolver};
         } else {
             throw "no parser for media type \"" + mediaType + "\"";
         }
+    },
+
+    QueryDB: function (sparqlInterface, slaveDB, cacheSize) {
+        return {
+            _: 'QueryDB',
+            sparqlInterface: sparqlInterface,
+            slaveDB: slaveDB,
+            cacheSize: cacheSize,
+            r: null,
+            queryStack: [],
+            _seen: 0,
+            cache: {},
+            LRU: [],
+            nodes: [],
+            triplesMatching: function (s, p, o) {
+                var queryDB = this;
+                function query () {
+                    var isSPO = (s && p && !o);
+                    if (isSPO) {
+                        queryDB.LRU.push(s.toString());
+                        queryDB.nodes.push(s);
+                        if (queryDB.LRU.length > queryDB.cacheSize) {
+                            queryDB.LRU.shift();
+                            queryDB.slaveDB.retract({s:queryDB.nodes.shift(), p:null, o:null});
+                        }
+                    }
+                    var pattern = "CONSTRUCT WHERE {" +
+                        " " + (s ? s.toString() : "?s") +
+                        " " + (!isSPO && p ? p.toString() : "?p") +
+                        " " + (o ? o.toString() : "?o") +
+                        " }";
+                    queryDB.sparqlInterface.execute(pattern, {async: false, done: function (r) {
+                        queryDB.r = r;
+                    }});
+                    var ret = queryDB.r.obj.slice();
+                    this._seen += ret.length;
+                    ret.forEach(function (t) { queryDB.slaveDB.push(t); });
+                }
+                if (!s || !p || o || this.LRU.indexOf(s.toString()) == -1)
+                    query();
+                return this.slaveDB.triplesMatching(s, p, o);
+            },
+            triplesMatching_str: function (s, p, o) {
+                throw "QueryDB.triplesMatching_str not implemented";
+            },
+            length: function () {
+                return -1; // unknown
+            },
+            uniqueSubjects: function () {
+                throw "QueryDB.uniqueSubjects not implemented";
+            },
+            slice: function (from, length) {
+                throw "QueryDB.slice not implemented";
+            },
+            clone: function () {
+                throw "QueryDB.clone not implemented";
+            },
+            splice: function (from, length) {
+                throw "QueryDB.splice not implemented";
+            },
+            index: function (t, at) {
+                throw "QueryDB.index not implemented";
+            },
+            push: function (t) {
+                throw "QueryDB.push not implemented";
+            },
+            insertAt: function (offset, t) {
+                throw "QueryDB.insertAt not implemented";
+            },
+            addComment: function (c) {
+                throw "QueryDB.addComment not implemented";
+            },
+
+            toString: function () {
+                throw "QueryDB.toString not implemented";
+            },
+            colorize: function (charmap) {
+                throw "QueryDB.colorize not implemented";
+            },
+
+            seen: function () {
+                return this._seen;
+            }
+        };
     },
 
     //
@@ -1719,7 +1961,7 @@ RDF = {
             // if (this.codes)
             //     Object.keys(this.codes).map(function (k) {
             //         charmap.insertBefore(this._pos.offset, "<span id='"+ruleId+"' class='code'>", ret.length);
-            //         ret += ' %' + k + '{' + this.codes[k] + '%}'; 
+            //         ret += ' %' + k + '{' + this.codes[k] + '%}';
             //         charmap.insertBefore(this._pos.offset, "</span>", ret.length);
             //     })
         };
@@ -1938,7 +2180,7 @@ RDF = {
                 // seenEmpty = true;
                     empties.push(r);
             }
-            if (passes.length && empties.length) // 
+            if (passes.length && empties.length) //
             { ret.status = RDF.DISPOSITION.FAIL; ret.error_mixedOpt(passes, empties, this); }
             else if (seenFail)
                 ret.status = RDF.DISPOSITION.FAIL;
@@ -2210,7 +2452,7 @@ RDF = {
 
     // Example XML generator.
     // Can be used like:
-    //   schema.eventHandlers = {GenX: RDF.GenXHandler(document.implementation, 
+    //   schema.eventHandlers = {GenX: RDF.GenXHandler(document.implementation,
     //                                                 new XMLSerializer())};
     GenXHandler: function (DOMImplementation, XMLSerializer) {
         return {
@@ -3810,7 +4052,7 @@ SELECT ?s ?p ?o {\n\
                 ret += this.matches.map(function (m) { return m.toHTML(depth+1, schemaIdMap, dataIdMap, solutions, classNames); }).join("\n");
                 return ret + "\n" + p + "}";
             }
-    },
+    }
 
 //    curSchema: new this.Schema()
 };
@@ -3820,6 +4062,5 @@ RDF.IRI.prototype.origText = origText;
 RDF.RDFLiteral.prototype.origText = origText;
 RDF.LangTag.prototype.origText = origText;
 RDF.BNode.prototype.origText = origText;
-
 
 module.exports = RDF;
