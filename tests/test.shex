@@ -1,30 +1,15 @@
+# Issue-simple-annotated.shex - Issue representation in Turtle
+
 #BASE <http://base.example/#>
 PREFIX ex: <http://ex.example/#>
-PREFIX foaf: <http://foaf.example/#>
+PREFIX foaf: <http://xmlns.com/foaf/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-start = <UserShape>
+start = <IssueShape>
 
-<IssueShape> {
-    ex:state (ex:unassigned ex:assigned),
-    ex:reportedBy @<UserShape>,
-    ex:reportedOn xsd:dateTime,
-    (ex:reproducedBy @<EmployeeShape>,
-     ex:reproducedOn xsd:dateTime)?,
-    ex:related @<IssueShape>*
-}
+<IssueShape> {ex:state (ex:unassigned ex:assigned),ex:reportedBy @<UserShape>,ex:reportedOn xsd:dateTime,(ex:reproducedBy @<EmployeeShape>,ex:reproducedOn xsd:dateTime)?,ex:related @<IssueShape>*}
 
-<UserShape> {
-    (foaf:name xsd:string
-     | foaf:givenName xsd:string+,
-       foaf:familyName xsd:string),
-    foaf:mbox IRI
-}
+<UserShape> {(foaf:name xsd:string|foaf:givenName xsd:string+,foaf:familyName xsd:string),foaf:mbox IRI}
 
-<EmployeeShape> {
-    foaf:givenName xsd:string+,
-    foaf:familyName xsd:string,
-    foaf:phone IRI+,
-    foaf:mbox IRI
-}
+<EmployeeShape> {foaf:givenName xsd:string+,foaf:familyName xsd:string,foaf:phone IRI*,foaf:mbox IRI}

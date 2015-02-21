@@ -2,7 +2,7 @@ var shexSchemaParser = require('./includes/shexParser.js');
 var RDF = require('./includes/Erics_RDF.js');
 
 
-function validate(schema, startingNodes, data, closedShapes) {
+function validate(schema, startingNodes, db, closedShapes, validationCallback) {
 
     var resolver = RDF.createIRIResolver();
 
@@ -12,27 +12,15 @@ function validate(schema, startingNodes, data, closedShapes) {
         startingNode = RDF.IRI(resolver.getAbsoluteIRI(startingNodes[startingNode]), RDF.Position0());
         schema.alwaysInvoke = {};
 
-        var db = RDF.Dataset();
+        var results;
 
-        data.forEach(function(triple) {
-            var t = RDF.Triple(
-                RDF.BNode(triple.subject, RDF.Position0()),
-                RDF.BNode(triple.predicate, RDF.Position0()),
-                RDF.BNode(triple.object, RDF.Position0())
-            );
-            if (this.nextInsertAt == null)
-                db.push(t);
-            else {
-                db.insertAt(this.nextInsertAt, t);
-                db.nextInsertAt = null;
-            }
-        });
-
-        schema.validate(startingNode, schema.startRule, db,
+        var validation = schema.validate(startingNode, schema.startRule, db,
             {
                 iriResolver: resolver,
                 closedShapes: closedShapes
             }, true);
+
+        validationCallback(validation);
     }
 
 }

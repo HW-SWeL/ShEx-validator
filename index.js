@@ -26,7 +26,7 @@ function validate(schemaText, dataText, callbacks, options) {
     var data = dataParser.parseData(dataText);
 
     Promise.all([schema, data]).done(function (a) {
-        validator.validate(a[0], ["<Issue1>"], a[1], false);
+        validator.validate(a[0], ["<Issue1>"], a[1], false, callbacks.validationCallback);
     });
 }
 
@@ -43,7 +43,16 @@ if (process.argv.length == 4) {
         });
 
     Promise.all([schema, data]).done(function (a) {
-        validate(a[0], a[1]);
+        validate(a[0], a[1], {
+            validationCallback: function (e) {
+                if(e.passed()) {
+                    console.log("passed");
+                }
+                else {
+                    console.log(e.toString());
+                }
+            }
+        });
     });
 
 }
