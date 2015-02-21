@@ -2,17 +2,15 @@ var shexSchemaParser = require('./includes/shexParser.js');
 var RDF = require('./includes/Erics_RDF.js');
 
 
-function validate(schema, startingNodes, db, closedShapes, validationCallback) {
+function validate(schema, startingNodes, db, closedShapes, validationCallback, resolver) {
+    //BEGIN HACKINESS
 
-    var resolver = RDF.createIRIResolver();
+    schema.alwaysInvoke = {};
+
 
     for (var startingNode in startingNodes) {
 
-        //BEGIN HACKINESS
-        startingNode = RDF.IRI(resolver.getAbsoluteIRI(startingNodes[startingNode]), RDF.Position0());
-        schema.alwaysInvoke = {};
-
-        var results;
+        startingNode = RDF.IRI(resolver.getAbsoluteIRI(startingNodes[startingNode]));
 
         var validation = schema.validate(startingNode, schema.startRule, db,
             {

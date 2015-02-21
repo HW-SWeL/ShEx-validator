@@ -6,10 +6,27 @@ PREFIX foaf: <http://xmlns.com/foaf/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-start = <IssueShape>
+start = <IssueShape>  # Issue validation starts with <IssueShape>
 
-<IssueShape> {ex:state (ex:unassigned ex:assigned),ex:reportedBy @<UserShape>,ex:reportedOn xsd:dateTime,(ex:reproducedBy @<EmployeeShape>,ex:reproducedOn xsd:dateTime)?,ex:related @<IssueShape>*}
+<IssueShape> {                           # An <IssueShape> has:
+    ex:state (ex:unassigned ex:assigned), # state which is
+                                          #   unassigned or assigned.
+    ex:reportedBy @<UserShape>,           # reported by a <UserShape>.
+    ex:reportedOn xsd:dateTime,           # reported some date/time.
+    (                                     # optionally
+     ex:reproducedBy @<EmployeeShape>,    #   reproduced by someone
+     ex:reproducedOn xsd:dateTime)?,
+    ex:related @<IssueShape>*}
 
-<UserShape> {(foaf:name xsd:string|foaf:givenName xsd:string+,foaf:familyName xsd:string),foaf:mbox IRI}
+<UserShape> {                           # A <UserShape> has:
+    (                                    # either
+       foaf:name xsd:string|                                   #  or
+       foaf:givenName xsd:string+,       #   one or more givenNames
+       foaf:familyName xsd:string),      #   and one familyName.
+    foaf:mbox IRI}
 
-<EmployeeShape> {foaf:givenName xsd:string+,foaf:familyName xsd:string,foaf:phone IRI*,foaf:mbox IRI}
+<EmployeeShape> {                      # An <EmployeeShape> has:
+    foaf:givenName xsd:string+,         # at least one givenName.
+    foaf:familyName xsd:string,         # one familyName.
+    foaf:phone IRI*,           # any number of phone numbers.
+    foaf:mbox IRI}

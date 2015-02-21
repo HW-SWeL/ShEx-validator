@@ -18,9 +18,9 @@ function parseWithN3(dataText) {
             if (error) reject(error);
             else if (triple) {
                 triple = RDF.Triple(
-                    RDF.BNode(triple.subject, RDF.Position0()),
-                    RDF.BNode(triple.predicate, RDF.Position0()),
-                    RDF.BNode(triple.object, RDF.Position0())
+                    RDF.IRI(triple.subject, RDF.Position0()),
+                    RDF.IRI(triple.predicate, RDF.Position0()),
+                    RDF.IRI(triple.object, RDF.Position0())
                 );
 
                 db.push(triple);
