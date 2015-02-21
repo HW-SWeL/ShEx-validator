@@ -1,4 +1,4 @@
-var shexSchemaParser = require('./includes/ShExSchemaParser.js');
+var shexSchemaParser = require('./includes/shexParser.js');
 var RDF = require('./includes/Erics_RDF.js');
 
 
@@ -28,11 +28,11 @@ function validate(schema, startingNodes, data, closedShapes) {
             }
         });
 
-        console.log(schema.validate(startingNode, schema.startRule, db,
+        schema.validate(startingNode, schema.startRule, db,
             {
                 iriResolver: resolver,
                 closedShapes: closedShapes
-            }, true));
+            }, true);
     }
 
 }

@@ -33,5 +33,6 @@ npm test
 
 ## Dev Dependencies
 
+- [pegjs](https://github.com/dmajda/pegjs): Parser generator for JavaScript
 
 None

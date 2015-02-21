@@ -1,6 +1,6 @@
 var Promise = require('promise');
 
-var shexSchemaParser = require('./includes/ShExSchemaParser.js');
+var shexSchemaParser = require('./includes/shexParser.js');
 var RDF = require('./includes/Erics_RDF.js');
 
 exports.parseSchema = function parseSchema(schemaText, resolver) {
