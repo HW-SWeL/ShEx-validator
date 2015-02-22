@@ -12,27 +12,28 @@ npm install git@github.com:HeriotWattMEng2015/ShEx-validator.git
 
 ## Usage
 ### In Code
-    var validator = require('ShEx-validator');
+```javascript
+var validator = require('ShEx-validator');
 
-    var schemaText = "...";
+var schemaText = "...";
 
-    var dataText = "...";
+var dataText = "...";
 
-    var callbacks = {
-        schemaParsed: function (schema) {...},
-        schemaParseError: function (errorMessage) {...},
-        dataParsed: function (data) {...},
-        dataParseError: function (errorMessage) {...},
-        tripleValidated: function (validation) {...},
-        validationError: function (validationError) {...}
-    };
+var callbacks = {
+    schemaParsed: function (schema) {...},
+    schemaParseError: function (errorMessage) {...},
+    dataParsed: function (data) {...},
+    dataParseError: function (errorMessage) {...},
+    tripleValidated: function (validation) {...},
+    validationError: function (validationError) {...}
+};
 
-    var options = {
-        closedShapes: true|false
-    };
+var options = {
+    closedShapes: true|false
+};
 
-    validator.validate(schemaText, dataText, callbacks, options);
-
+validator.validate(schemaText, dataText, callbacks, options);
+```
 
 ### On Command Line
 While developing: `node index.js tests/test.shex tests/test.turtle`
