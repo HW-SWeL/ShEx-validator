@@ -43,34 +43,37 @@ module.exports.validate = validate;
 
 if (process.argv.length == 4) {
 
-    var schema = readFile(process.argv[2])
-        .then(function (text) {
-            return text.toString();
-        }
-    );
-    var data = readFile(process.argv[3])
-        .then(function (text) {
-            return text.toString();
-        });
-
     var out = console.log;
     var error = console.error;
+
+    function toString(t) { return t.toString(); };
+    function ioError(e) { error(e); process.exit(exitCodes.ioError); };
+
+    var schema = readFile(process.argv[2]).then(toString, ioError);
+    var data = readFile(process.argv[3]).then(toString, ioError);
 
     Promise.all([schema, data]).done(function (a) {
         validate(a[0], a[1], {
             schemaParsed: function (schema) {
                 out("Schema Parsed: " + schema.ruleLabels.length + " rules.");
             },
-            schemaParseError: error,
+            schemaParseError: function (errorMessage) {
+                error(errorMessage);
+                process.exit(exitCodes.schemaParseError);
+            },
             dataParsed: function (data) {
                 out("Data Parsed: " + data.triples.length + " triples.");
             },
-            dataParseError: error,
+            dataParseError: function (errorMessage) {
+                error(errorMessage);
+                process.exit(exitCodes.dataParseError);
+            },
             tripleValidated: function (validation) {
-                out("Validation Passed" );
+                out("Validation Passed");
             },
             validationError: function (e) {
                 error(e.toString());
+                process.exit(exitCodes.validationError);
             }
         });
     });
