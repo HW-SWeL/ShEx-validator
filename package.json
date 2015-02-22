@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/HeriotWattMEng2015/ShEx-validator",
   "dependencies": {
+    "minimist": "^1.1.0",
     "n3": "^0.4.1",
     "promise": "^6.1.0"
   },

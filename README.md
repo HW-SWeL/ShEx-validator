@@ -36,9 +36,22 @@ validator.validate(schemaText, dataText, callbacks, options);
 ```
 
 ### On Command Line
-While developing: `node index.js tests/test.shex tests/test.turtle`
 
-In future when globally installed: `ShEx-validator <schema> <data>`
+While developing: `node index.js tests/test.shex tests/test.turtle Issue1`
+
+In future when globally installed:
+
+<!--- BEGIN USAGE -->
+    Usage:
+        ShEx-validator [options] SCHEMA DATA STARTING_NODE [STARTING_NODE...]
+        ShEx-validator [options] SCHEMA DATA -f
+
+    Options:
+        -f, --find-nodes    Validate all nodes which match the starting rule.
+                            Cannot be used when specifying STARTING_NODE.
+        -c, --closed-shape  Schema must mention all used shapes
+        -h, --help          print usage information
+<!--- END USAGE -->
 
 ## Development
 
