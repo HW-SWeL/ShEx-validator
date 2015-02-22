@@ -17,8 +17,8 @@ start = <SummaryLevelShape>
 
 <SummaryLevelShape> {
     rdf:type (dctypes:Dataset),
-    dct:title xsd:string,  ### should be rdf:langString
-    dct:description xsd:string, ### should be rdf:langString
+    dct:title rdf:langString,  ### should be rdf:langString
+    dct:description rdf:langString, ### should be rdf:langString
 ###negate dct:created .,
 ###negate pav:createdOn .,
 ###negate pav:authoredOn .,
@@ -68,8 +68,8 @@ start = <SummaryLevelShape>
 
 <VersionLevelShape> {
     rdf:type (dctypes:Dataset),
-    dct:title xsd:string,  ### should be rdf:langString
-    dct:description xsd:string, ### should be rdf:langString
+    dct:title rdf:langString,  ### should be rdf:langString
+    dct:description rdf:langString, ### should be rdf:langString
     # Ensure that at least one of created or issued dates is provided
     (dct:created xsd:dateTime, dct:issued xsd:dateTime? |
         dct:created xsd:dateTime?, dct:issued xsd:dateTime),
@@ -115,8 +115,8 @@ start = <SummaryLevelShape>
 
 <DistributionLevelShape> {
     rdf:type (dctypes:Dataset),
-    dct:title xsd:string,  ### should be rdf:langString
-    dct:description xsd:string, ### should be rdf:langString
+    dct:title rdf:langString,  ### should be rdf:langString
+    dct:description rdf:langString, ### should be rdf:langString
     # Ensure that at least one of created or issued dates is provided
     (dct:created xsd:dateTime, dct:issued xsd:dateTime? |
         dct:created xsd:dateTime?, dct:issued xsd:dateTime),
@@ -155,8 +155,8 @@ start = <SummaryLevelShape>
 
 <RDFDistributionLevelShape> {
     rdf:type (void:Dataset),
-    dct:title xsd:string,  ### should be rdf:langString
-    dct:description xsd:string, ### should be rdf:langString
+    dct:title rdf:langString,  ### should be rdf:langString
+    dct:description rdf:langString, ### should be rdf:langString
     # Ensure that at least one of created or issued dates is provided
     (dct:created xsd:dateTime, dct:issued xsd:dateTime? |
         dct:created xsd:dateTime?, dct:issued xsd:dateTime),
