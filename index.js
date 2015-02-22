@@ -6,25 +6,24 @@ var validator = require("./validator.js");
 
 function validate(schemaText, dataText, callbacks, options) {
 
-    var resolver = RDF.createIRIResolver();
+    var schema = schemaParser.parseSchema(schemaText);
 
-    var schema = schemaParser.parseSchema(schemaText, resolver);
+    schema.done(callbacks.schemaParsed, callbacks.schemaParseError);
 
-    schema.then(callbacks.schemaParsed, callbacks.schemaParseError);
+    var data = dataParser.parseData(dataText);
 
-    var data = dataParser.parseData(dataText, resolver);
+    data.done(callbacks.dataParsed, callbacks.dataParseError);
 
-    data.then(callbacks.dataParsed, callbacks.dataParseError);
-
-    Promise.all([schema, data]).then(function (a) {
+    Promise.all([schema, data]).done(function (a) {
         validator.validate(
-            a[0],                       // Schema
+            a[0].schema,                       // Schema
+            a[0].resolver,
             options.startingNodes,      // Starting Node
-            a[1],                       // data
+            a[1].db,                       // db
+            a[1].resolver,
             options.closedShapes,       // closed shapes
             callbacks.tripleValidated,  // Success callback
-            callbacks.validationError,  // Error callback
-            resolver                    // iriResolver
+            callbacks.validationError  // Error callback
         );
     });
 }

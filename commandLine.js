@@ -31,9 +31,8 @@ function exitWithUsage() {
 
 function processCommandLine(argv) {
 
-
     var out = console.log;
-    var error = console.error;
+    var error = console.log;
 
     var toString  = function(t) { return t.toString(); };
     var ioError = function(e) { error(e); process.exit(exitCodes.ioError); };
@@ -69,14 +68,14 @@ function processCommandLine(argv) {
 
     var callbacks = {
         schemaParsed: function (schema) {
-            out("Schema Parsed: " + schema.ruleLabels.length + " rules.");
+            console.log("Schema Parsed: " + schema.schema.ruleLabels.length + " rules.");
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
             process.exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
-            out("Data Parsed: " + data.triples.length + " triples.");
+            out("Data Parsed: " + data.db.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error(errorMessage);
@@ -94,11 +93,11 @@ function processCommandLine(argv) {
     var options = {
         closedShapes: argv.closedShape,
         findNodes: argv.findNodes,
-        startingNodes: [argv._.slice(2)]
+        startingNodes: argv._.slice(2)
     };
 
-    return Promise.all([schema, data]).then(function (a) {
-        ShEx.validate(a[0], a[1], callbacks, options)
+    return Promise.all([schema, data]).done(function (a) {
+        ShEx.validate(a[0], a[1], callbacks, options);
     });
 }
 

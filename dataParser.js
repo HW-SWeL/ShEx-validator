@@ -8,9 +8,19 @@ exports.parseData = function parseData(dataText) {
     return parseWithN3(dataText);
 };
 
-function parseNode(text) {
-    if(N3Util.isLiteral(text)) {
-        return RDF.RDFLiteral(text, N3Util.getLiteralLanguage(text), "<" + N3Util.getLiteralType(text) + ">");
+function parseNode(text, prefixes) {
+
+    if (prefixes && N3Util.isPrefixedName(text)) {
+        text = N3Util.expandPrefixedName(text, prefixes);
+    }
+
+    if (N3Util.isLiteral(text)) {
+        return RDF.RDFLiteral(
+            N3Util.getLiteralValue(text),
+            RDF.LangTag(N3Util.getLiteralLanguage(text)),
+            //TODO fix this hackery to fix where N3Utils gives a type when not explicitly declared which RDF.js doesn't like
+            (text.indexOf("^^") > -1)?RDF.IRI(N3Util.getLiteralType(text)):undefined
+        );
     }
     else if (N3Util.isIRI(text)) {
         return RDF.IRI(text);
@@ -21,11 +31,13 @@ function parseNode(text) {
     throw new Error("Unknown Type of Node");
 }
 
+exports.parseNode = parseNode;
 
 function parseWithN3(dataText) {
     var parser = N3.Parser();
 
     return new Promise(function (resolve, reject) {
+        var resolver = RDF.createIRIResolver();
         var db = RDF.Dataset();
 
         parser.parse(dataText, function (error, triple, prefixes) {
@@ -39,7 +51,10 @@ function parseWithN3(dataText) {
 
                 db.push(triple);
             }
-            else resolve(db);
+            else {
+                resolver.Prefixes = prefixes;
+                resolve({db: db, resolver: resolver});
+            }
         });
     });
 }
