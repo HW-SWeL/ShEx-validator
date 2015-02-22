@@ -187,7 +187,7 @@ function origText () {
 
 RDF = {
     message: function (str) {
-        console.error(str);
+        //console.error(str);
     },
 
     // SPARQL validation queries can't expression recursive grammars.

@@ -14,45 +14,63 @@ var exitCodes = {
     ioError: 4
 };
 
-/*
- callbacks = {
- schemaParseError : function (err)
- }
- */
 function validate(schemaText, dataText, callbacks, options) {
 
     var resolver = RDF.createIRIResolver();
 
     var schema = schemaParser.parseSchema(schemaText, resolver);
 
+    schema.then(callbacks.schemaParsed, callbacks.schemaParseError);
+
     var data = dataParser.parseData(dataText, resolver);
 
-    Promise.all([schema, data]).done(function (a) {
-        validator.validate(a[0], ["Issue1"], a[1], false, callbacks.validationCallback, resolver);
+    data.then(callbacks.dataParsed, callbacks.dataParseError);
+
+    Promise.all([schema, data]).then(function (a) {
+        validator.validate(
+            a[0],                       // Schema
+            ["Issue1"],                 // Starting Node
+            a[1],                       // data
+            false,                      //
+            callbacks.tripleValidated,  // Success callback
+            callbacks.validationError,  // Error callback
+            resolver                    // iriResolver
+        );
     });
 }
 
 module.exports.validate = validate;
 
 if (process.argv.length == 4) {
-    var schema = readFile(process.argv[2], 'utf8')
+
+    var schema = readFile(process.argv[2])
         .then(function (text) {
-            return text;
-        });
+            return text.toString();
+        }
+    );
     var data = readFile(process.argv[3])
         .then(function (text) {
             return text.toString();
         });
 
+    var out = console.log;
+    var error = console.error;
+
     Promise.all([schema, data]).done(function (a) {
         validate(a[0], a[1], {
-            validationCallback: function (e) {
-                if(e.passed()) {
-                    console.log("passed");
-                }
-                else {
-                    console.log(e.toString());
-                }
+            schemaParsed: function (schema) {
+                out("Schema Parsed: " + schema.ruleLabels.length + " rules.");
+            },
+            schemaParseError: error,
+            dataParsed: function (data) {
+                out("Data Parsed: " + data.triples.length + " triples.");
+            },
+            dataParseError: error,
+            tripleValidated: function (validation) {
+                out("Validation Passed" );
+            },
+            validationError: function (e) {
+                error(e.toString());
             }
         });
     });

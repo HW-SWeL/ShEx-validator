@@ -15,18 +15,24 @@ start = <IssueShape>  # Issue validation starts with <IssueShape>
     ex:reportedOn xsd:dateTime,           # reported some date/time.
     (                                     # optionally
      ex:reproducedBy @<EmployeeShape>,    #   reproduced by someone
-     ex:reproducedOn xsd:dateTime)?,
-    ex:related @<IssueShape>*}
+     ex:reproducedOn xsd:dateTime         #   at some data/time.
+    )?,
+    ex:related @<IssueShape>*             # n related issues.
+}
 
 <UserShape> {                           # A <UserShape> has:
     (                                    # either
-       foaf:name xsd:string|                                   #  or
+       foaf:name xsd:string              #   a FOAF name
+     |                                   #  or
        foaf:givenName xsd:string+,       #   one or more givenNames
        foaf:familyName xsd:string),      #   and one familyName.
-    foaf:mbox IRI}
+    foaf:mbox IRI               # one FOAF mbox.
+}
 
 <EmployeeShape> {                      # An <EmployeeShape> has:
     foaf:givenName xsd:string+,         # at least one givenName.
     foaf:familyName xsd:string,         # one familyName.
     foaf:phone IRI*,           # any number of phone numbers.
-    foaf:mbox IRI}
+    foaf:mbox IRI              # one FOAF mbox.
+
+}
