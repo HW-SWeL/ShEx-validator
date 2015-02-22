@@ -7,7 +7,11 @@ exports.parseData = function parseData(dataText) {
 };
 
 function parseNode(text) {
-    if(text.indexOf("^^") > -1) return RDF.RDFLiteral(text, undefined, "<http://www.w3.org/2001/XMLSchema#dateTime>");
+    typeMarker = text.indexOf("^^");
+    if(typeMarker > -1){
+        var type = text.substr(typeMarker+2, text.length);
+        return RDF.RDFLiteral(text, undefined, "<" + type + ">");
+    }
     else if(text.substr(0, 1) == "\"") return RDF.RDFLiteral(text);
     else return RDF.IRI(text);
 }
