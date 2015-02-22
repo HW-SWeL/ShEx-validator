@@ -64,6 +64,7 @@ TODO
 
 ### Dependencies
 
+- [minimist](https://github.com/substack/minimist): parse argument options
 - [n3](https://github.com/RubenVerborgh/N3.js): Lightning fast, asynchronous, streaming Turtle / N3 / RDF library.
 - [promise](https://github.com/then/promise): Bare bones Promises/A+ implementation
 
