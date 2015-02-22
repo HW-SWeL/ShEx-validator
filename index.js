@@ -6,14 +6,6 @@ var dataParser = require("./dataParser.js");
 var schemaParser = require("./schemaParser.js");
 var validator = require("./validator.js");
 
-var exitCodes = {
-    success: 0,
-    dataParseError: 1,
-    schemaParseError: 2,
-    validationError: 3,
-    ioError: 4
-};
-
 function validate(schemaText, dataText, callbacks, options) {
 
     var resolver = RDF.createIRIResolver();
@@ -41,13 +33,21 @@ function validate(schemaText, dataText, callbacks, options) {
 
 module.exports.validate = validate;
 
+var exitCodes = {
+    success: 0,
+    dataParseError: 1,
+    schemaParseError: 2,
+    validationError: 3,
+    ioError: 4
+};
+
 if (process.argv.length == 4) {
 
     var out = console.log;
     var error = console.error;
 
-    function toString(t) { return t.toString(); };
-    function ioError(e) { error(e); process.exit(exitCodes.ioError); };
+    var toString  = function(t) { return t.toString(); };
+    var ioError = function(e) { error(e); process.exit(exitCodes.ioError); };
 
     var schema = readFile(process.argv[2]).then(toString, ioError);
     var data = readFile(process.argv[3]).then(toString, ioError);
@@ -77,5 +77,4 @@ if (process.argv.length == 4) {
             }
         });
     });
-
 }
