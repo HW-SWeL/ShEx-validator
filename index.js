@@ -45,36 +45,51 @@ var exitCodes = {
 
 if (process) {
 
-    argv = parseArgs(process.argv.slice(2), {
-        defaults: {
-            closedShape : false
-        },
-        alias: {
-            h: "help",
-            v: "version"
-        }
-    });
-
     var out = console.log;
     var error = console.error;
 
     var toString  = function(t) { return t.toString(); };
     var ioError = function(e) { error(e); process.exit(exitCodes.ioError); };
 
-    if(argv.help || argv._.length < 4) {
+    function exitWithUsage() {
         readFile(__dirname+'/README.md').done(function(f) {
             var readme = f.toString();
 
             var usageStartTag = "<!--- BEGIN USAGE -->";
             var usageStart = readme.indexOf(usageStartTag) + usageStartTag.length;
             var usageEnd = readme.indexOf("<!--- END USAGE -->");
-            var usageLen = usageEnd - usageStart - usageStartTag.length;
+            var usageLen = usageEnd - usageStart;
 
             var usage = readme.substr(usageStart, usageLen);
             out(usage);
             process.exit(exitCodes.incorrectArguments);
         });
     }
+
+    var argv = parseArgs(process.argv.slice(2), {
+        boolean: ["findNodes", "closedShape"],
+        alias: {
+            f: "findNodes",
+            c: "closedShape",
+            h: "help",
+            v: "version"
+        },
+        unknown : function (unkownParam) {
+            if(unkownParam.substr(0, 1) == '-') {
+                error("Unknown paramater: " + unkownParam);
+                exitWithUsage();
+            }
+        }
+    });
+
+    var alen = argv._.length;
+
+    if(
+        argv.help ||
+        alen < 2 ||
+        (alen < 3 && !argv.findNodes)||
+        (alen > 2 && argv.findNodes)
+    ) exitWithUsage();
 
     var schema = readFile(argv._[0]).then(toString, ioError);
     var data = readFile(argv._[1]).then(toString, ioError);
@@ -105,6 +120,7 @@ if (process) {
 
     var options = {
         closedShapes: argv.closeShape,
+        findNodes: argv.findNodes,
         startingNodes: [argv._.slice(2)]
     };
 
