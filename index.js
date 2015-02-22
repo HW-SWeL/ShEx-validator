@@ -21,9 +21,9 @@ function validate(schemaText, dataText, callbacks, options) {
     Promise.all([schema, data]).then(function (a) {
         validator.validate(
             a[0],                       // Schema
-            ["Issue1"],                 // Starting Node
+            options.startingNodes,      // Starting Node
             a[1],                       // data
-            false,                      //
+            options.closedShapes,       // closed shapes
             callbacks.tripleValidated,  // Success callback
             callbacks.validationError,  // Error callback
             resolver                    // iriResolver
@@ -52,29 +52,36 @@ if (process.argv.length == 4) {
     var schema = readFile(process.argv[2]).then(toString, ioError);
     var data = readFile(process.argv[3]).then(toString, ioError);
 
+    var callbacks = {
+        schemaParsed: function (schema) {
+            out("Schema Parsed: " + schema.ruleLabels.length + " rules.");
+        },
+        schemaParseError: function (errorMessage) {
+            error(errorMessage);
+            process.exit(exitCodes.schemaParseError);
+        },
+        dataParsed: function (data) {
+            out("Data Parsed: " + data.triples.length + " triples.");
+        },
+        dataParseError: function (errorMessage) {
+            error(errorMessage);
+            process.exit(exitCodes.dataParseError);
+        },
+        tripleValidated: function (validation) {
+            out("Validation Passed");
+        },
+        validationError: function (e) {
+            error(e.toString());
+            process.exit(exitCodes.validationError);
+        }
+    };
+
+    var options = {
+        closedShapes: false,
+        startingNodes: ["Issue1"]
+    };
+
     Promise.all([schema, data]).done(function (a) {
-        validate(a[0], a[1], {
-            schemaParsed: function (schema) {
-                out("Schema Parsed: " + schema.ruleLabels.length + " rules.");
-            },
-            schemaParseError: function (errorMessage) {
-                error(errorMessage);
-                process.exit(exitCodes.schemaParseError);
-            },
-            dataParsed: function (data) {
-                out("Data Parsed: " + data.triples.length + " triples.");
-            },
-            dataParseError: function (errorMessage) {
-                error(errorMessage);
-                process.exit(exitCodes.dataParseError);
-            },
-            tripleValidated: function (validation) {
-                out("Validation Passed");
-            },
-            validationError: function (e) {
-                error(e.toString());
-                process.exit(exitCodes.validationError);
-            }
-        });
+        validate(a[0], a[1], callbacks, options);
     });
 }
