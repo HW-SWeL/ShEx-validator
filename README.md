@@ -29,7 +29,8 @@ var callbacks = {
 };
 
 var options = {
-    closedShapes: true|false
+    closedShapes: true|false,
+    startingNodes: ["...", ...]
 };
 
 validator.validate(schemaText, dataText, callbacks, options);
@@ -44,11 +45,8 @@ In future when globally installed:
 <!--- BEGIN USAGE -->
     Usage:
         ShEx-validator [options] SCHEMA DATA STARTING_NODE [STARTING_NODE...]
-        ShEx-validator [options] SCHEMA DATA -f
 
     Options:
-        -f, --find-nodes    Validate all nodes which match the starting rule.
-                            Cannot be used when specifying STARTING_NODE.
         -c, --closed-shape  Schema must mention all used shapes
         -h, --help          print usage information
 <!--- END USAGE -->

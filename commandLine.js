@@ -41,9 +41,8 @@ function processCommandLine(argv) {
 
 
     argv = parseArgs(argv.slice(2), {
-        boolean: ["findNodes", "closedShape"],
+        boolean: ["closedShape"],
         alias: {
-            f: "findNodes",
             c: "closedShape",
             h: "help",
             v: "version"
