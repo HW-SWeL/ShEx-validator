@@ -1,25 +1,29 @@
 var Promise = require('promise');
 
 var RDF = require('./includes/Erics_RDF.js');
+var N3 = require('n3');
+var N3Util = N3.Util;
 
 exports.parseData = function parseData(dataText) {
     return parseWithN3(dataText);
 };
 
 function parseNode(text) {
-    typeMarker = text.indexOf("^^");
-    if(typeMarker > -1){
-        var type = text.substr(typeMarker+2, text.length);
-        return RDF.RDFLiteral(text, undefined, "<" + type + ">");
+    if(N3Util.isLiteral(text)) {
+        return RDF.RDFLiteral(text, N3Util.getLiteralLanguage(text), "<" + N3Util.getLiteralType(text) + ">");
     }
-    else if(text.substr(0, 1) == "\"") return RDF.RDFLiteral(text);
-    else return RDF.IRI(text);
+    else if (N3Util.isIRI(text)) {
+        return RDF.IRI(text);
+    }
+    else if (N3Util.isBlank(text)) {
+        return RDF.BNode(text);
+    }
+    throw new Error("Unknown Type of Node");
 }
 
 
 function parseWithN3(dataText) {
-    var n3 = require('n3');
-    var parser = n3.Parser();
+    var parser = N3.Parser();
 
     return new Promise(function (resolve, reject) {
         var db = RDF.Dataset();
@@ -34,7 +38,6 @@ function parseWithN3(dataText) {
                 );
 
                 db.push(triple);
-
             }
             else resolve(db);
         });
