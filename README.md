@@ -35,9 +35,18 @@ npm install git@github.com:HeriotWattMEng2015/ShEx-validator.git
 
 
 ### On Command Line
-While developing: `node index.js tests/test.shex tests/test.turtle`
 
-In future when globally installed: `ShEx-validator <schema> <data>`
+While developing: `node index.js tests/test.shex tests/test.turtle Issue1`
+
+In future when globally installed:
+
+<!--- BEGIN USAGE -->
+    Usage:
+        ShEx-validator SCHEMA DATA STARTING_NODE [options]
+
+    Options:
+        -h, --help         print usage information
+<!--- END USAGE -->
 
 ## Development
 

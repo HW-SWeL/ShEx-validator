@@ -1,5 +1,6 @@
 var Promise = require('promise');
 
+var parseArgs = require('minimist');
 var readFile = Promise.denodeify(require('fs').readFile);
 
 var dataParser = require("./dataParser.js");
@@ -38,10 +39,21 @@ var exitCodes = {
     dataParseError: 1,
     schemaParseError: 2,
     validationError: 3,
-    ioError: 4
+    ioError: 4,
+    incorrectArguments: 5
 };
 
-if (process.argv.length == 4) {
+if (process) {
+
+    argv = parseArgs(process.argv.slice(2), {
+        defaults: {
+            closedShape : false
+        },
+        alias: {
+            h: "help",
+            v: "version"
+        }
+    });
 
     var out = console.log;
     var error = console.error;
@@ -49,8 +61,23 @@ if (process.argv.length == 4) {
     var toString  = function(t) { return t.toString(); };
     var ioError = function(e) { error(e); process.exit(exitCodes.ioError); };
 
-    var schema = readFile(process.argv[2]).then(toString, ioError);
-    var data = readFile(process.argv[3]).then(toString, ioError);
+    if(argv.help || argv._.length < 4) {
+        readFile(__dirname+'/README.md').done(function(f) {
+            var readme = f.toString();
+
+            var usageStartTag = "<!--- BEGIN USAGE -->";
+            var usageStart = readme.indexOf(usageStartTag) + usageStartTag.length;
+            var usageEnd = readme.indexOf("<!--- END USAGE -->");
+            var usageLen = usageEnd - usageStart - usageStartTag.length;
+
+            var usage = readme.substr(usageStart, usageLen);
+            out(usage);
+            process.exit(exitCodes.incorrectArguments);
+        });
+    }
+
+    var schema = readFile(argv._[0]).then(toString, ioError);
+    var data = readFile(argv._[1]).then(toString, ioError);
 
     var callbacks = {
         schemaParsed: function (schema) {
@@ -77,8 +104,8 @@ if (process.argv.length == 4) {
     };
 
     var options = {
-        closedShapes: false,
-        startingNodes: ["Issue1"]
+        closedShapes: argv.closeShape,
+        startingNodes: [argv._.slice(2)]
     };
 
     Promise.all([schema, data]).done(function (a) {
