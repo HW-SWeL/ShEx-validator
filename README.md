@@ -63,10 +63,10 @@ Validation is still performed by a combination of Erics PEG generated `includes/
 Tests are done using Jasmine, and the test specifications are located in specs/.
 
 To run the tests do: 
-
+```sh
 npm install jasmine-node -g
-run jasmine-node specs
-
+jasmine-node specs
+```
 ### Dependencies
 
 - [minimist](https://github.com/substack/minimist): parse argument options
