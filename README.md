@@ -64,8 +64,7 @@ Tests are done using Jasmine, and the test specifications are located in specs/.
 
 To run the tests do: 
 ```sh
-npm install jasmine-node -g
-jasmine-node specs
+npm test
 ```
 ### Dependencies
 
