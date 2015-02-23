@@ -18,8 +18,7 @@ function parseNode(text, prefixes) {
         return RDF.RDFLiteral(
             N3Util.getLiteralValue(text),
             RDF.LangTag(N3Util.getLiteralLanguage(text)),
-            //TODO fix this hackery to fix where N3Utils gives a type when not explicitly declared which RDF.js doesn't like
-            (text.indexOf("^^") > -1)?RDF.IRI(N3Util.getLiteralType(text)):undefined
+            RDF.IRI(N3Util.getLiteralType(text))
         );
     }
     else if (N3Util.isIRI(text)) {
