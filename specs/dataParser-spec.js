@@ -10,9 +10,24 @@ describe("parseNode", function () {
 
 describe("parseNode", function () { 
     it("Should throw an error", function () {
-        //var literal = dataParser.parseNode("\"random");
         function tester() {
             dataParser.parseNode("\"random");
+        }
+        expect(tester).toThrow();
+    });
+});
+
+describe("parseNode", function () { 
+    it("Should return a RDF.IRI", function () {
+        var iri = dataParser.parseNode("IRI");
+        expect(iri._).toEqual("IRI");
+    });
+});
+
+describe("parseNode", function () { 
+    it("Should throw an error", function () {
+        function tester() {
+            dataParser.parseNode("");
         }
         expect(tester).toThrow();
     });
