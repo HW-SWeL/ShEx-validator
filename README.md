@@ -60,8 +60,13 @@ Currently only n3.js is used for parsing the data but others can easily be added
 Validation is still performed by a combination of Erics PEG generated `includes/shexParser` and `includes/RDF.js`.
 
 ### Tests
-TODO
+Tests are done using Jasmine, and the test specifications are located in specs/.
 
+To run the tests do: 
+```sh
+npm install jasmine-node -g
+jasmine-node specs
+```
 ### Dependencies
 
 - [minimist](https://github.com/substack/minimist): parse argument options
