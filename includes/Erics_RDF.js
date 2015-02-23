@@ -4033,7 +4033,7 @@ SELECT ?s ?p ?o {\n\
                 this.misses.push.apply(this.misses, res.errors)
             },
             this.passed = function () {
-                return this.status == RDF.DISPOSITION.PASS;
+                //return this.status == RDF.DISPOSITION.PASS;
                 return this.matches.length > 0 && this.errors.length === 0;
             },
             this.toString = function (depth) {
