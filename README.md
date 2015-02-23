@@ -74,6 +74,7 @@ npm test
 
 ### Dev Dependencies
 
+- [jasmine-node](https://github.com/mhevery/jasmine-node): DOM-less simple JavaScript BDD testing framework for Node
 - [pegjs](https://github.com/dmajda/pegjs): Parser generator for JavaScript
 
 ## License
