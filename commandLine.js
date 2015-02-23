@@ -72,21 +72,22 @@ function processCommandLine(argv) {
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
-            process.exit(exitCodes.schemaParseError);
+            //TODO work out how to log and exit with nice code
+            //process.exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
             out("Data Parsed: " + data.db.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error(errorMessage);
-            process.exit(exitCodes.dataParseError);
+            //process.exit(exitCodes.dataParseError);
         },
         tripleValidated: function (validation) {
             out("Validation Passed");
         },
         validationError: function (e) {
             error(e.toString());
-            process.exit(exitCodes.validationError);
+            //process.exit(exitCodes.validationError);
         }
     };
 
