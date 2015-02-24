@@ -1,5 +1,9 @@
 var Promise = require('promise');
 
+var fs = require('fs');
+var stream = require('stream');
+var exit = require('exit');
+
 var ShEx = require('./index.js');
 
 var parseArgs = require('minimist');
@@ -14,6 +18,11 @@ var exitCodes = {
     incorrectArguments: 5
 };
 
+var out = console.log;
+
+
+var error = console.log;
+
 function exitWithUsage() {
     readFile(__dirname+'/README.md').done(function(f) {
         var readme = f.toString();
@@ -25,17 +34,17 @@ function exitWithUsage() {
 
         var usage = readme.substr(usageStart, usageLen);
         out(usage);
-        process.exit(exitCodes.incorrectArguments);
+
+        exit(exitCodes.incorrectArguments);
     });
 }
 
 function processCommandLine(argv) {
 
-    var out = console.log;
-    var error = console.log;
+
 
     var toString  = function(t) { return t.toString(); };
-    var ioError = function(e) { error(e); process.exit(exitCodes.ioError); };
+    var ioError = function(e) { error(e); exit(exitCodes.ioError); };
 
 
 
@@ -68,26 +77,25 @@ function processCommandLine(argv) {
 
     var callbacks = {
         schemaParsed: function (schema) {
-            console.log("Schema Parsed: " + schema.schema.ruleLabels.length + " rules.");
+            out("Schema Parsed: " + schema.schema.ruleLabels.length + " rules.");
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
-            //TODO work out how to log and exit with nice code
-            //process.exit(exitCodes.schemaParseError);
+            exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
             out("Data Parsed: " + data.db.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error(errorMessage);
-            //process.exit(exitCodes.dataParseError);
+            exit(exitCodes.dataParseError);
         },
         tripleValidated: function (validation) {
             out("Validation Passed");
         },
         validationError: function (e) {
             error(e.toString());
-            //process.exit(exitCodes.validationError);
+            exit(exitCodes.validationError);
         }
     };
 
