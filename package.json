@@ -4,7 +4,7 @@
   "description": "Parses and a ShEx schema and ShEx data file and validates the data against the schema.",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/jasmine-node/bin/jasmine-node specs --autotest --watch *.js"
+    "test": "node ./node_modules/jasmine-node/bin/jasmine-node specs"
   },
   "repository": {
     "type": "git",
