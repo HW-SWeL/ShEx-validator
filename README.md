@@ -1,4 +1,4 @@
-# ShEx-validator 
+# ShEx-validator [![Build Status](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator.svg?branch=master)](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator)
 
 Parses and a ShEx schema and ShEx data file and validates the data against the schema.
 
