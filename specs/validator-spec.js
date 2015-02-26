@@ -1,46 +1,48 @@
 var ShEx = require("../index.js");
 
 
-var schema = "PREFIX foaf: <http://xmlns.com/foaf/>\
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+var goodSchema = "PREFIX foaf: <http://xmlns.com/foaf/>\
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\
     start = <PersonShape>\
 <PersonShape> {\
-    foaf:name rdf:langString\
+    foaf:name xsd:string\
 }";
 
-var data = "PREFIX foaf: <http://xmlns.com/foaf/>\
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+var goodData = "PREFIX foaf: <http://xmlns.com/foaf/>\
     <Somebody>\
-foaf:name \"Mr Smith\"^^rdf:langString.\
+foaf:name \"Mr Smith\".\
 ";
 
 
-describe("Validate inheritance", function () {
-    it("Should successfully parse", function (done) {
-        var callbacks = {
-            schemaParsed: function (schema) {
-            },
-            schemaParseError: function (errorMessage) {
-            },
-            dataParsed: function (data) {
-            },
-            dataParseError: function (errorMessage) {
-            },
-            tripleValidated: function (validation) {
-            },
-            validationError: function (e) {
-            }
-        };
-        var options = {
-            startingNodes: ["Somebody"]
-        };
-
-        spyOn(callbacks, 'tripleValidated');
-
-        ShEx.validate(schema, data, callbacks, options).then(function() {
-            expect(callbacks.tripleValidated).toHaveBeenCalled();
-            done();
-        });
+describe("Validation Tests", function () {
+    it("Should call tripleValidated", function (done) {
+        testValidate(done, goodSchema, goodData, "tripleValidated", ["Somebody"]);
     });
 });
 
+function testValidate(done, schema, data, expectedCallback, startingNodes) {
+    var callbacks = {
+        schemaParsed: function (schema) {
+        },
+        schemaParseError: function (errorMessage) {
+        },
+        dataParsed: function (data) {
+        },
+        dataParseError: function (errorMessage) {
+        },
+        tripleValidated: function (validation) {
+        },
+        validationError: function (e) {
+        }
+    };
+    var options = {
+        startingNodes: startingNodes
+    };
+
+    spyOn(callbacks, expectedCallback);
+
+    ShEx.validate(schema, data, callbacks, options).done(function () {
+        expect(callbacks[expectedCallback]).toHaveBeenCalled();
+        done();
+    });
+}
