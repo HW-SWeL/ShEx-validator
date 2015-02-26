@@ -19,8 +19,6 @@ var exitCodes = {
 };
 
 var out = console.log;
-
-
 var error = console.log;
 
 function exitWithUsage() {
@@ -41,19 +39,16 @@ function exitWithUsage() {
 
 function processCommandLine(argv) {
 
-
-
     var toString  = function(t) { return t.toString(); };
     var ioError = function(e) { error(e); exit(exitCodes.ioError); };
 
-
-
     argv = parseArgs(argv.slice(2), {
-        boolean: ["closedShape"],
+        boolean: ["closed-shape", "absolute-iri"],
         alias: {
-            c: "closedShape",
+            c: "closed-shape",
             h: "help",
-            v: "version"
+            v: "version",
+            a: "absolute-iri"
         },
         unknown : function (unkownParam) {
             if(unkownParam.substr(0, 1) == '-') {
@@ -81,28 +76,30 @@ function processCommandLine(argv) {
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
-            exit(exitCodes.schemaParseError);
+            //exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
             out("Data Parsed: " + data.db.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
+            error("Data Parse Error:");
             error(errorMessage);
-            exit(exitCodes.dataParseError);
+            //exit(exitCodes.dataParseError);
         },
         tripleValidated: function (validation) {
             out("Validation Passed");
         },
         validationError: function (e) {
             error(e.toString());
-            exit(exitCodes.validationError);
+            //exit(exitCodes.validationError);
         }
     };
 
     var options = {
-        closedShapes: argv.closedShape,
-        findNodes: argv.findNodes,
-        startingNodes: argv._.slice(2)
+        closedShapes: argv.c,
+        findNodes: argv.f,
+        startingNodes: argv._.slice(2),
+        absoluteIri: argv.a
     };
 
     return Promise.all([schema, data]).done(function (a) {
@@ -110,4 +107,6 @@ function processCommandLine(argv) {
     });
 }
 
-module.exports = processCommandLine;
+if(process) {
+    processCommandLine(process.argv);
+}

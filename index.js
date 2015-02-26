@@ -14,7 +14,7 @@ function validate(schemaText, dataText, callbacks, options) {
 
     data.done(callbacks.dataParsed, callbacks.dataParseError);
 
-    Promise.all([schema, data]).done(function (a) {
+    return Promise.all([schema, data]).then(function (a) {
         validator.validate(
             a[0].schema,                       // Schema
             a[0].resolver,
@@ -25,11 +25,7 @@ function validate(schemaText, dataText, callbacks, options) {
             callbacks.tripleValidated,  // Success callback
             callbacks.validationError  // Error callback
         );
-    });
+    }, function(err) { throw err; });
 }
 
 module.exports.validate = validate;
-
-if (process) {
-    require("./commandLine.js")(process.argv);
-}
