@@ -12,7 +12,7 @@ npm install git@github.com:HeriotWattMEng2015/ShEx-validator.git
 
 ## Usage
 ### In Code
-```javascript
+```js
 var validator = require('ShEx-validator');
 
 var schemaText = "...";
@@ -24,16 +24,34 @@ var callbacks = {
     schemaParseError: function (errorMessage) {...},
     dataParsed: function (data) {...},
     dataParseError: function (errorMessage) {...},
-    tripleValidated: function (validation) {...},
-    validationError: function (validationError) {...}
+    validationResult: function (validationResult) {...}
 };
 
 var options = {
     closedShapes: true|false,
-    startingNodes: ["...", ...]
+    startingNodes: ["...", ...],
+    absoluteIri: true|false
 };
 
 validator.validate(schemaText, dataText, callbacks, options);
+```
+
+#### Callbacks
+Not nearly finished or perfected but it is the current implementation.
+
+```js
+validationResult = {
+    passed: true|false,
+    startingNode: RDF.RDFLiteral|RDF.IRI,
+    matches: [{
+        rule: RDF.Triple,
+        triple: RDF.Triple
+    ]},
+    errors: [{
+        name: string,
+        triple: RDF.Triple
+    ]}
+}
 ```
 
 ### On Command Line
@@ -48,7 +66,7 @@ In future when globally installed:
 
     Options:
         -c, --closed-shape  Schema must mention all used shapes
-        -h, --help          print usage information
+        -h, --help          Print usage information
 <!--- END USAGE -->
 
 ## Development

@@ -22,10 +22,9 @@ function validate(schemaText, dataText, callbacks, options) {
             a[1].db,                       // db
             a[1].resolver,
             options.closedShapes,       // closed shapes
-            callbacks.tripleValidated,  // Success callback
-            callbacks.validationError  // Error callback
+            callbacks.validationResult  // validation result
         );
-    }, function(err) { throw err; });
+    });
 }
 
 module.exports.validate = validate;

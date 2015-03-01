@@ -86,12 +86,11 @@ function processCommandLine(argv) {
             error(errorMessage);
             //exit(exitCodes.dataParseError);
         },
-        tripleValidated: function (validation) {
-            out("Validation Passed");
-        },
-        validationError: function (e) {
-            error(e.toString());
-            //exit(exitCodes.validationError);
+        validationResult: function (validation) {
+            if(validation.passed)
+                out("Validation Passed: " + validation.matches.length + " matches");
+            else
+                error("Validation failed: " + validation.errors.length + " rules failed")
         }
     };
 
@@ -102,8 +101,8 @@ function processCommandLine(argv) {
         absoluteIri: argv.a
     };
 
-    return Promise.all([schema, data]).done(function (a) {
-        ShEx.validate(a[0], a[1], callbacks, options);
+    Promise.all([schema, data]).done(function (a) {
+        ShEx.validate(a[0], a[1], callbacks, options).done();
     });
 }
 

@@ -16,7 +16,7 @@ foaf:name \"Mr Smith\".\
 
 describe("Validation Tests", function () {
     it("Should call tripleValidated", function (done) {
-        testValidate(done, goodSchema, goodData, "tripleValidated", ["Somebody"]);
+        testValidate(done, goodSchema, goodData, "validationResult", ["Somebody"]);
     });
 });
 
@@ -30,9 +30,7 @@ function testValidate(done, schema, data, expectedCallback, startingNodes) {
         },
         dataParseError: function (errorMessage) {
         },
-        tripleValidated: function (validation) {
-        },
-        validationError: function (e) {
+        validationResult: function (validation) {
         }
     };
     var options = {
@@ -41,8 +39,8 @@ function testValidate(done, schema, data, expectedCallback, startingNodes) {
 
     spyOn(callbacks, expectedCallback);
 
-    ShEx.validate(schema, data, callbacks, options).done(function () {
+    ShEx.validate(schema, data, callbacks, options).then(function () {
         expect(callbacks[expectedCallback]).toHaveBeenCalled();
         done();
-    });
+    }, done);
 }
