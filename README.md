@@ -29,7 +29,7 @@ var callbacks = {
 
 var options = {
     closedShapes: true|false,
-    startingNodes: ["...", ...],
+    startingNodes: ["...", ...], // Generally you want at least 1 otherwise you are validating nothing
     absoluteIri: true|false
 };
 
