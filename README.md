@@ -7,7 +7,7 @@ A standalone Node module with a command line interface and validate() function a
 ## Installation
 
 ```sh
-npm install git@github.com:HeriotWattMEng2015/ShEx-validator.git
+npm install HeriotWattMEng2015/ShEx-validator
 ```
 
 ## Usage
