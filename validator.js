@@ -1,5 +1,6 @@
 var RDF = require('./includes/Erics_RDF.js');
 var dataParser = require("./dataParser.js");
+var errorFormatter = require("./validationErrorFormatter.js");
 
 
 function validate(schema,
@@ -36,13 +37,7 @@ function validate(schema,
 }
 
 function cleanupValidation(valRes, resolver, startingNode) {
-    var errors = valRes.errors.map(function(fail) {
-        var rule = RDF.Triple(fail.rule.label, fail.rule.nameClass.term, fail.rule.valueClass.type);
-        return {
-            name: fail._,
-            triple : rule
-        }
-    });
+    var errors = valRes.errors.map(errorFormatter);
 
     var matches = valRes.matches.map(function (ruleMatch) {
         var match = RDF.Triple(ruleMatch.rule.label, ruleMatch.rule.nameClass.term, ruleMatch.rule.valueClass.type);
