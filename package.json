@@ -19,7 +19,7 @@
   "dependencies": {
     "exit": "^0.1.2",
     "minimist": "^1.1.0",
-    "n3": "^0.4.1",
+    "n3": "git://github.com/HeriotWattMEng2015/N3.js",
     "promise": "^6.1.0"
   },
   "devDependencies": {

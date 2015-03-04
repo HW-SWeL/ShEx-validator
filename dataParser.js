@@ -39,14 +39,16 @@ function parseWithN3(dataText) {
         var resolver = RDF.createIRIResolver();
         var db = RDF.Dataset();
 
-        parser.parse(dataText, function (error, triple, prefixes) {
+        parser.parse(dataText, function (error, N3triple, prefixes) {
             if (error) reject(error);
-            else if (triple) {
-                triple = RDF.Triple(
-                    parseNode(triple.subject),
-                    parseNode(triple.predicate),
-                    parseNode(triple.object)
+            else if (N3triple) {
+                var triple = RDF.Triple(
+                    parseNode(N3triple.subject),
+                    parseNode(N3triple.predicate),
+                    parseNode(N3triple.object)
                 );
+
+                triple.line = N3triple.line;
 
                 db.push(triple);
             }
