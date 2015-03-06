@@ -39,17 +39,9 @@ function validate(schema,
 function cleanupValidation(valRes, resolver, startingNode) {
     var errors = valRes.errors.map(errorFormatter);
 
-    var matches = valRes.matches.map(function (ruleMatch) {
-        var match = RDF.Triple(ruleMatch.rule.label, ruleMatch.rule.nameClass.term, ruleMatch.rule.valueClass.type);
-        return {
-            rule : match,
-            triple : ruleMatch.triple
-        }
-    });
-
     return {
         errors: errors,
-        matches: matches,
+        matches: valRes.matches,
         startingNode: startingNode,
         passed: valRes.passed()
     };
