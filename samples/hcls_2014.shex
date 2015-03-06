@@ -18,7 +18,7 @@ PREFIX void:    <http://rdfs.org/ns/void#>
 start = <SummaryLevelShape>
 
 <SummaryLevelShape> {
-	rdf:type dctypes:Dataset,    ###void:Dataset should only be used for RDF distributions of the dataset
+	rdf:type (dctypes:Dataset),    ###void:Dataset should only be used for RDF distributions of the dataset
 	dct:title rdf:langString,    ###
 	dct:identifier xsd:string?,    ###
 	dct:alternative rdf:langString?,    ###
