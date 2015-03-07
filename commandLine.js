@@ -90,6 +90,7 @@ function processCommandLine(argv) {
             if(validation.passed)
                 out("Validation Passed: " + validation.matches.length + " matches");
             else
+                error("Validation Failed :");
                 for(var e in validation.errors) {
                     error(validation.errors[e].name + " : " + validation.errors[e].triple)
                 }
