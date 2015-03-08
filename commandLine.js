@@ -86,7 +86,7 @@ function processCommandLine(argv) {
             //exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
-            out("Data Parsed: " + data.db.triples.length + " triples.");
+            out("Data Parsed: " + data.subjects.length + " subjects and " + data.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error("Data Parse Error:");
@@ -99,9 +99,9 @@ function processCommandLine(argv) {
             else {
                 for (var shape in shapes) {
                     if (shapes[shape])
-                        out(shape + " Is a " + shapes[shape])
+                        out(shape + " Is a " + shapes[shape]);
                     else
-                        error(shape + " Could not be found")
+                        error(shape + " Could not be found");
                 }
             }
 
