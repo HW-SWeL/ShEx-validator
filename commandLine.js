@@ -1,7 +1,5 @@
 var Promise = require('promise');
 
-var fs = require('fs');
-var stream = require('stream');
 var exit = require('exit');
 
 var ShEx = require('./index.js');
@@ -19,10 +17,10 @@ var exitCodes = {
 };
 
 var out = console.log;
-var error = console.log;
+var error = console.error;
 
 function exitWithUsage() {
-    readFile(__dirname+'/README.md').done(function(f) {
+    readFile(__dirname + '/README.md').done(function (f) {
         var readme = f.toString();
 
         var usageStartTag = "<!--- BEGIN USAGE -->";
@@ -39,20 +37,27 @@ function exitWithUsage() {
 
 function processCommandLine(argv) {
 
-    var toString  = function(t) { return t.toString(); };
-    var ioError = function(e) { error(e); exit(exitCodes.ioError); };
+    var toString = function (t) {
+        return t.toString();
+    };
+    var ioError = function (e) {
+        error(e);
+        exit(exitCodes.ioError);
+    };
 
     argv = parseArgs(argv.slice(2), {
-        boolean: ["closed-shape", "absolute-iri"],
+        boolean: ["closed-shape", "absolute-iri", "find-types", "find-and-use-types"],
         alias: {
             c: "closed-shape",
             h: "help",
             v: "version",
-            a: "absolute-iri"
+            a: "absolute-iri",
+            f: "find-types",
+            F: "find-and-use-types"
         },
-        unknown : function (unkownParam) {
-            if(unkownParam.substr(0, 1) == '-') {
-                error("Unknown paramater: " + unkownParam);
+        unknown: function (unknownParam) {
+            if (unknownParam.substr(0, 1) == '-') {
+                error("Unknown paramater: " + unknownParam);
                 exitWithUsage();
             }
         }
@@ -60,15 +65,17 @@ function processCommandLine(argv) {
 
     var alen = argv._.length;
 
-    if(
+    if (
         argv.help ||
         alen < 2 ||
-        (alen < 3 && !argv.findNodes)||
+        (alen < 3 && !argv.findNodes) ||
         (alen > 2 && argv.findNodes)
     ) exitWithUsage();
 
     var schema = readFile(argv._[0]).then(toString, ioError);
     var data = readFile(argv._[1]).then(toString, ioError);
+
+    var validator;
 
     var callbacks = {
         schemaParsed: function (schema) {
@@ -86,29 +93,51 @@ function processCommandLine(argv) {
             error(errorMessage);
             //exit(exitCodes.dataParseError);
         },
+        findShapesResult: function (shapes) {
+            if (argv.F)
+                validator.validate(shapes).done();
+            else {
+                for (var shape in shapes) {
+                    if (shapes[shape])
+                        out(shape + " Is a " + shapes[shape])
+                    else
+                        error(shape + " Could not be found")
+                }
+            }
+
+        },
         validationResult: function (validation) {
-            if(validation.passed)
+            if (validation.passed)
                 out("Validation Passed: " + validation.matches.length + " matches");
-            else
+            else {
                 error("Validation Failed :");
-                for(var e in validation.errors) {
+                for (var e in validation.errors) {
                     error(validation.errors[e].name + " : " + validation.errors[e].triple)
                 }
+            }
         }
     };
 
     var options = {
-        closedShapes: argv.c,
-        findNodes: argv.f,
-        startingNodes: argv._.slice(2),
-        absoluteIri: argv.a
+        closedShapes: argv.c
     };
 
     Promise.all([schema, data]).done(function (a) {
-        ShEx.validate(a[0], a[1], callbacks, options).done();
+        validator = new ShEx.Validator(a[0], a[1], callbacks, options);
+        if (argv.f || argv.F) {
+            validator.findShapes().done();
+        }
+        else {
+            var startingNodes = {};
+            argv._.slice(2).forEach(function (str) {
+                var parts = str.split("=");
+                startingNodes[parts[0]] = parts[1];
+            })
+        }
+        validator.validate(startingNodes).done();
     });
 }
 
-if(process) {
+if (process) {
     processCommandLine(process.argv);
 }

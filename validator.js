@@ -14,13 +14,15 @@ function validate(schema,
 
     schema.alwaysInvoke = {};
 
-    for (var startingNode in startingNodes) {
+    for (var startingNodeName in startingNodes) {
 
-        startingNode = dataParser.parseNode(startingNodes[startingNode], dbResolver.Prefixes);
+        if(!startingNodes[startingNodeName]) break;
+
+        startingNode = dataParser.parseNode(startingNodeName, dbResolver.Prefixes);
 
         var validation = schema.validate(
             startingNode,
-            schema.startRule,
+            startingNodes[startingNodeName],
             db,
             {
                 iriResolver: schemaResolver,

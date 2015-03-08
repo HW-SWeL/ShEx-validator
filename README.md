@@ -13,27 +13,35 @@ npm install HeriotWattMEng2015/ShEx-validator
 ## Usage
 ### In Code
 ```js
-var validator = require('ShEx-validator');
+var ShEx = require('ShEx-validator');
 
 var schemaText = "...";
 
 var dataText = "...";
+
+var startingNodes = {
+    "STARTING NODE" : "NODE SHAPE",
+    ...
+};
 
 var callbacks = {
     schemaParsed: function (schema) {...},
     schemaParseError: function (errorMessage) {...},
     dataParsed: function (data) {...},
     dataParseError: function (errorMessage) {...},
-    validationResult: function (validationResult) {...}
+    validationResult: function (validationResult) {...},
+    shapeFindingResult: function(shapes) {...}
 };
 
 var options = {
     closedShapes: true|false,
-    startingNodes: ["...", ...], // Generally you want at least 1 otherwise you are validating nothing
-    absoluteIri: true|false
 };
 
-validator.validate(schemaText, dataText, callbacks, options);
+var validator = new ShEx.Validator(schemaText, dataText, callbacks, options);
+
+validator.findShapes();
+
+validator.validate(startingNodes);
 ```
 
 #### Callbacks
@@ -52,6 +60,12 @@ validationResult = {
         triple: RDF.Triple
     ]}
 }
+
+shapeFindingResult = {
+    "NODE NAME" : "NODE SHAPE" | null,
+    ...
+};
+
 ```
 
 ### On Command Line
@@ -63,10 +77,12 @@ In future when globally installed:
 <!--- BEGIN USAGE -->
     Usage:
         ShEx-validator [options] SCHEMA DATA STARTING_NODE [STARTING_NODE...]
+        ShEx-validator [options] SCHEMA DATA -f
 
     Options:
         -c, --closed-shape  Schema must mention all used shapes
         -h, --help          Print usage information
+        -f --find-shapes    Find and print shapes which match the data
 <!--- END USAGE -->
 
 ## Development
