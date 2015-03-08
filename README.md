@@ -79,7 +79,7 @@ shapeFindingResult = {
 
 ### On Command Line
 
-While developing: `node commandLine.js samples/test.shex samples/test.turtle Issue1`
+While developing: `node commandLine.js samples/test.shex samples/test.turtle Issue1:IssueShape`
 
 In future when globally installed:
 
