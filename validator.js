@@ -43,7 +43,7 @@ function cleanupValidation(valRes, resolver, startingNode) {
         errors: errors,
         matches: valRes.matches,
         startingNode: startingNode,
-        passed: valRes.passed()
+        passed: errors.length === 0
     };
 }
 
