@@ -79,7 +79,7 @@ function processCommandLine(argv) {
 
     var callbacks = {
         schemaParsed: function (schema) {
-            out("Schema Parsed: " + schema.schema.ruleLabels.length + " rules.");
+            out("Schema Parsed: " + schema.shapes.length + " shapes.");
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
