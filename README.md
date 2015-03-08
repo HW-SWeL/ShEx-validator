@@ -79,7 +79,7 @@ shapeFindingResult = {
 
 ### On Command Line
 
-While developing: `node commandLine.js samples/hcls_2014.shex samples/chembl_2014.ttl  http://rdf.ebi.ac.uk/chembl/chembl=<SummaryLevelShape>`
+While developing: `node commandLine.js samples/hcls_2014.shex samples/chembl_2014.ttl  http://rdf.ebi.ac.uk/chembl/chembl=SummaryLevelShape`
 
 
 In future when globally installed:
