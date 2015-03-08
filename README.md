@@ -41,7 +41,7 @@ var validator = new ShEx.Validator(schemaText, dataText, callbacks, options);
 
 validator.findShapes();
 
-validator.validate(startingNodes);
+validator.validate(startingShapes);
 ```
 
 #### Callbacks
