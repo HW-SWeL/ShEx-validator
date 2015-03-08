@@ -18,7 +18,7 @@ function validate(schema,
 
         if(!startingShapes[startingShape]) break;
 
-        startingNode = dataParser.parseNode(startingShape, dbResolver.Prefixes);
+        var startingNode = dataParser.parseNode(startingShape, dbResolver.Prefixes);
 
         var validation = schema.validate(
             startingNode,
@@ -39,7 +39,7 @@ function validate(schema,
 }
 
 function cleanupValidation(valRes, resolver, startingShape) {
-    var errors = valRes.errors.map(errorFormatter);
+    var errors = valRes.errors.map(errorFormatter.bind(this,startingShape));
 
     return {
         errors: errors,
