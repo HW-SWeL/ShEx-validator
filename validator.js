@@ -5,7 +5,7 @@ var errorFormatter = require("./validationErrorFormatter.js");
 
 function validate(schema,
                   schemaResolver,
-                  startingNodes,
+                  startingShapes,
                   db,
                   dbResolver,
                   closedShapes,
@@ -14,15 +14,15 @@ function validate(schema,
 
     schema.alwaysInvoke = {};
 
-    for (var startingNodeName in startingNodes) {
+    for (var startingShape in startingShapes) {
 
-        if(!startingNodes[startingNodeName]) break;
+        if(!startingShapes[startingShape]) break;
 
-        startingNode = dataParser.parseNode(startingNodeName, dbResolver.Prefixes);
+        startingNode = dataParser.parseNode(startingShape, dbResolver.Prefixes);
 
         var validation = schema.validate(
             startingNode,
-            startingNodes[startingNodeName],
+            startingShapes[startingShape],
             db,
             {
                 iriResolver: schemaResolver,
@@ -38,13 +38,13 @@ function validate(schema,
     }
 }
 
-function cleanupValidation(valRes, resolver, startingNode) {
+function cleanupValidation(valRes, resolver, startingShape) {
     var errors = valRes.errors.map(errorFormatter);
 
     return {
         errors: errors,
         matches: valRes.matches,
-        startingNode: startingNode,
+        startingShape: startingShape,
         passed: errors.length === 0
     };
 }

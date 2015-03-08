@@ -1,6 +1,6 @@
 # ShEx-validator [![Build Status](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator.svg?branch=master)](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator)
 
-Parses and a ShEx schema and ShEx data file and validates the data against the schema.
+Parses and a ShEx schema and RDF data file and validates the shapes in the data against the shape definitions in the schema.
 
 A standalone Node module with a command line interface and validate() function as described below
 
@@ -19,8 +19,8 @@ var schemaText = "...";
 
 var dataText = "...";
 
-var startingNodes = {
-    "STARTING NODE" : "NODE SHAPE",
+var startingShapes = {
+    "SHAPE" : "SHAPE DEFINITION",
     ...
 };
 
@@ -48,9 +48,18 @@ validator.validate(startingNodes);
 Not nearly finished or perfected but it is the current implementation.
 
 ```js
+schemaParsed = {
+    shapeDefinitions: ["SHAPE NAME", ...]
+}
+
+dataParsed = {
+    shapes: ["SHAPE"],
+    triples: [RDF.Triple]
+}
+
 validationResult = {
     passed: true|false,
-    startingNode: RDF.RDFLiteral|RDF.IRI,
+    shape: RDF.RDFLiteral|RDF.IRI,
     matches: [{
         rule: RDF.Triple,
         triple: RDF.Triple
@@ -62,7 +71,7 @@ validationResult = {
 }
 
 shapeFindingResult = {
-    "NODE NAME" : "NODE SHAPE" | null,
+    "SHAPE" : "SHAPE DEFINITION" | null,
     ...
 };
 
@@ -80,9 +89,9 @@ In future when globally installed:
         ShEx-validator [options] SCHEMA DATA -f
 
     Options:
-        -c, --closed-shape  Schema must mention all used shapes
+        -c, --closed-shape  Schema must mention all used shape definitions
         -h, --help          Print usage information
-        -f --find-shapes    Find and print shapes which match the data
+        -f, --find-shapes   Find and print shape definitions which match the shapes
 <!--- END USAGE -->
 
 ## Development

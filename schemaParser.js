@@ -14,10 +14,10 @@ exports.parseSchema = function parseSchema(schemaText) {
             reject(e);
         }
 
-        var shapes = schema.ruleLabels.map(function (rule) {
+        var shapeDefinitions = schema.ruleLabels.map(function (rule) {
             return rule.toString();
         });
 
-        resolve({schema: schema, resolver: resolver, shapes: shapes});
+        resolve({schema: schema, resolver: resolver, shapeDefinitions: shapeDefinitions});
     });
 };

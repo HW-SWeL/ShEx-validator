@@ -46,14 +46,14 @@ function processCommandLine(argv) {
     };
 
     argv = parseArgs(argv.slice(2), {
-        boolean: ["closed-shape", "absolute-iri", "find-types", "find-and-use-types"],
+        boolean: ["closed-shape", "absolute-iri", "find-shapes", "find-and-use-shapes"],
         alias: {
             c: "closed-shape",
             h: "help",
             v: "version",
             a: "absolute-iri",
-            f: "find-types",
-            F: "find-and-use-types"
+            f: "find-shapes",
+            F: "find-and-use-shapes"
         },
         unknown: function (unknownParam) {
             if (unknownParam.substr(0, 1) == '-') {
@@ -68,8 +68,8 @@ function processCommandLine(argv) {
     if (
         argv.help ||
         alen < 2 ||
-        (alen < 3 && !argv.findNodes) ||
-        (alen > 2 && argv.findNodes)
+        (alen < 3 && !(argv.f || argv.F)) ||
+        (alen > 2 && (argv.f || argv.F))
     ) exitWithUsage();
 
     var schema = readFile(argv._[0]).then(toString, ioError);
@@ -79,14 +79,14 @@ function processCommandLine(argv) {
 
     var callbacks = {
         schemaParsed: function (schema) {
-            out("Schema Parsed: " + schema.shapes.length + " shapes.");
+            out("Schema Parsed: " + schema.shapeDefinitions.length + " shape definitions.");
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
             //exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
-            out("Data Parsed: " + data.subjects.length + " subjects and " + data.triples.length + " triples.");
+            out("Data Parsed: " + data.shapes.length + " shapes and " + data.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error("Data Parse Error:");
@@ -128,13 +128,13 @@ function processCommandLine(argv) {
             validator.findShapes().done();
         }
         else {
-            var startingNodes = {};
+            var startingShapes = {};
             argv._.slice(2).forEach(function (str) {
                 var parts = str.split("=");
-                startingNodes[parts[0]] = parts[1];
+                startingShapes[parts[0]] = parts[1];
             })
         }
-        validator.validate(startingNodes).done();
+        validator.validate(startingShapes).done();
     });
 }
 
