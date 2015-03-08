@@ -39,7 +39,7 @@ function validate(schema,
 }
 
 function cleanupValidation(valRes, resolver, startingShape) {
-    var errors = valRes.errors.map(errorFormatter);
+    var errors = valRes.errors.map(errorFormatter.bind(this,startingShape));
 
     return {
         errors: errors,

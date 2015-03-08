@@ -41,7 +41,7 @@ var validator = new ShEx.Validator(schemaText, dataText, callbacks, options);
 
 validator.findShapes();
 
-validator.validate(startingNodes);
+validator.validate(startingShapes);
 ```
 
 #### Callbacks
@@ -81,11 +81,12 @@ shapeFindingResult = {
 
 While developing: `node commandLine.js samples/hcls_2014.shex samples/chembl_2014.ttl  http://rdf.ebi.ac.uk/chembl/chembl=<SummaryLevelShape>`
 
+
 In future when globally installed:
 
 <!--- BEGIN USAGE -->
     Usage:
-        ShEx-validator [options] SCHEMA DATA STARTING_NODE [STARTING_NODE...]
+        ShEx-validator [options] SCHEMA DATA SHAPE:SHAPE_DEFINITION [SHAPE:SHAPE_DEFINITION ...]
         ShEx-validator [options] SCHEMA DATA -f
 
     Options:
