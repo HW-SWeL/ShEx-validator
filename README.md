@@ -86,7 +86,7 @@ In future when globally installed:
 
 <!--- BEGIN USAGE -->
     Usage:
-        ShEx-validator [options] SCHEMA DATA SHAPE:SHAPE_DEFINITION [SHAPE:SHAPE_DEFINITION ...]
+        ShEx-validator [options] SCHEMA DATA SHAPE=SHAPE_DEFINITION [SHAPE=SHAPE_DEFINITION ...]
         ShEx-validator [options] SCHEMA DATA -f
 
     Options:
