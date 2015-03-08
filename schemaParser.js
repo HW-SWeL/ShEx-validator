@@ -13,6 +13,11 @@ exports.parseSchema = function parseSchema(schemaText) {
         catch (e) {
             reject(e);
         }
-        resolve({schema: schema, resolver: resolver});
+
+        var shapes = schema.ruleLabels.map(function (rule) {
+            return rule.toString();
+        });
+
+        resolve({schema: schema, resolver: resolver, shapes: shapes});
     });
 };
