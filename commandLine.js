@@ -131,10 +131,12 @@ function processCommandLine(argv) {
             var startingShapes = {};
             argv._.slice(2).forEach(function (str) {
                 var parts = str.split("=");
-                startingShapes[parts[0]] = parts[1];
-            })
+                if (parts.length !== 2) exitWithUsage();
+                startingShapes[parts[0]] = "<" + parts[1] + ">";
+            });
+            validator.validate(startingShapes).done();
         }
-        validator.validate(startingShapes).done();
+
     });
 }
 
