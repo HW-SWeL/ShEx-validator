@@ -18,7 +18,7 @@ function validate(schema,
 
         if(!startingShapes[startingShape]) break;
 
-        startingNode = dataParser.parseNode(startingShape, dbResolver.Prefixes);
+        var startingNode = dataParser.parseNode(startingShape, dbResolver.Prefixes);
 
         var validation = schema.validate(
             startingNode,
