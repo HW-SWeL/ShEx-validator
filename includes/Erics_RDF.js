@@ -3446,7 +3446,7 @@ RDF = {
 
                             // record the success.
                             RDF.message(s.toString() + " is a " + ruleLabel.toString());
-                            var t = RDF.Triple(s, RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0()), ruleLabel);
+                            var t = RDF.Triple(RDF.IRI(s), RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0()), ruleLabel);
                             ret.matchedTree(this.ruleMap[ruleLabel], t, res);
                         }
                     }
