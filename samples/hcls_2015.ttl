@@ -70,6 +70,7 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
     dct:creator :ebi ;
     dct:contributor :annaGaulton ;
     pav:createdBy <http://orcid.org/0000-0002-8011-0300> ;
+    pav:createdWith :ThisSeemsToBeARequirement ;
     pav:authoredBy :annaGaulton ;
     pav:curatedBy :annaGaulton ;
     dct:issued "2013-08-29"^^xsd:date ;
@@ -94,14 +95,14 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
     idot:preferredPrefix "chembl" ;
     idot:alternatePrefix "chembldb" ;
 #Provenance and Change
-    pav:version "17"^^xsd:string, "17.0" ;
+    pav:version "17"^^xsd:string ; ###HAD TO REMOVE THIS , "17.0" ;
     dct:isVersionOf :chembl ;
     pav:previousVersion :chembl16 ;
     dct:source :pubchem-bioassay-09-01-2014 ;
     pav:retrievedFrom :pubchem-bioassay-09-01-2014 ;
     prov:wasDerivedFrom :pubchem-bioassay-09-01-2014 ;
 #Availability/Distributions
-    dcat:distribution :chembl17db, :chembl17rdf ;
+    dcat:distribution :chembl17db; ### HAD TO REMOVE THIS, :chembl17rdf ;
     dcat:accessURL <ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_17/> ;
     dcat:landingPage <ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_17/chembl_17_release_notes.txt> ;
 .
