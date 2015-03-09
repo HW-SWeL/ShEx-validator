@@ -31,22 +31,25 @@ function validate(schema,
             true
         );
 
-        var cleanedResults = cleanupValidation(validation, dbResolver, startingNode);
+        return cleanupValidation(validation, dbResolver, startingNode, validationResult);
 
-        validationResult(cleanedResults);
 
     }
 }
 
-function cleanupValidation(valRes, resolver, startingShape) {
-    var errors = valRes.errors.map(errorFormatter.bind(this,startingShape));
+function cleanupValidation(valRes, resolver, startingShape, cb) {
 
-    return {
-        errors: errors,
-        matches: valRes.matches,
-        startingShape: startingShape,
-        passed: errors.length === 0
-    };
+    return valRes.then(function(valRes) {
+        var errors = valRes.errors.map(errorFormatter);
+
+        cb( {
+            errors: errors,
+            matches: valRes.matches,
+            startingShape: startingShape,
+            passed: errors.length === 0
+        });
+    });
+
 }
 
 module.exports.validate = validate;

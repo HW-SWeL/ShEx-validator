@@ -1,3 +1,5 @@
+var Promise = require("Promise");
+
 function pad (d, str) {
     if (str === undefined) str = '  ';
     var ret = '';
@@ -190,6 +192,26 @@ RDF = {
         //console.error(str);
     },
 
+    StructuredError_proto: {
+    },
+    StructuredError: function (data) {
+        var ret = {
+            _: "StructuredError",
+            data: data,
+            toString: function () {
+                return data.map(function (p) {
+                    return p[0] == "code" ? "\""+p[1]+"\"" : p[1];
+                }).join("\n");
+            }
+        };
+        Object.keys(RDF.StructuredError_proto).map(function (k) {
+            ret[k] = RDF.StructuredError_proto[k];
+        });
+        return ret;
+    },
+
+    /* <Exceptions>
+     */
     // SPARQL validation queries can't expression recursive grammars.
     ValidationRecursion: function (label) {
         this._ = 'ValidationRecursion'; this.label = label;
@@ -201,6 +223,8 @@ RDF = {
             return "Rule " + this.label.toString() + " not found in schema.";
         };
     },
+    /* </Exceptions>
+     */
 
     createIRIResolver: function() {
         return {
@@ -318,8 +342,8 @@ RDF = {
 
     // Three kinds of position. Not needed in the long run, but useful for recording what's expected.
     Position5: function (_orig, line, column, offset, width) {
-        if (Math.abs(_orig.length - width) > 1)
-            RDF.message(new Error("'"+_orig+"'.length = "+_orig.length+" != "+width));
+        // if (Math.abs(_orig.length - width) > 1)
+        //     RDF.message(new Error("'"+_orig+"'.length = "+_orig.length+" != "+width));
         return { _orig:_orig, line:line, column:column, offset:offset, width:width,
             origText: function () { return this._orig; }
         };
@@ -570,6 +594,9 @@ RDF = {
                 ss(this.SPO);
                 return ret;
             },
+            triplesMatching_async: function (s, p, o) {
+                return Promise.resolve(this.triplesMatching(s, p, o));
+            },
             triplesMatching_str: function (s, p, o) {
                 var ret = [];
                 for (var i = 0; i < this.triples.length; ++i) {
@@ -585,7 +612,13 @@ RDF = {
                 return this.triples === null ? -1 : this.triples.length;
             },
             uniqueSubjects: function () {
-                return Object.keys(this.SPO);
+                var _Dataset = this;
+                return Object.keys(this.SPO).map(function (s) {
+                    // Dive in and grab triple.s for first p and o.
+                    var p = Object.keys(_Dataset.SPO[s])[0];
+                    var o = Object.keys(_Dataset.SPO[s][p])[0];
+                    return _Dataset.SPO[s][p][o][0].s;
+                });
             },
             slice: function (from, length) {
                 if (this.triples === null)
@@ -752,15 +785,24 @@ RDF = {
                 var merge = $.extend({
                     url: url + separator + "query=" + encodeURIComponent(query)
                 }, parms);
-                $.ajax(merge).done(function (body, textStatus, jqXHR) {
-                    // Crappy mime parser doesn't handle quoted-string
-                    //  c.f. http://tools.ietf.org/html/rfc7230#section-3.2.6
-                    var ray = jqXHR.getResponseHeader("content-type").split(/;/)
-                        .map(function (s) { return s.replace(/ /g,''); });
-                    var r = RDF.parseSPARQLResults(body, ray.shift(), ray);
-                    done(r);
-                }).fail(fail).always(always);
-                return this;
+
+                return new Promise(function (resolve, reject) {
+                    $.ajax(merge).then(function (body, textStatus, jqXHR) {
+                        if (jqXHR.status === 200) {
+                            // Crappy mime parser doesn't handle quoted-string
+                            //  c.f. http://tools.ietf.org/html/rfc7230#section-3.2.6
+                            var ray = jqXHR.getResponseHeader("content-type").split(/;/)
+                                .map(function (s) { return s.replace(/ /g,''); });
+                            var r = RDF.parseSPARQLResults(body, ray.shift(), ray);
+                            resolve(r);
+                        } else {
+                            reject([body, jqXHR]);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        jqXHR.statusText = "connection or CORS failure";
+                        reject(["", jqXHR]);
+                    });
+                });
             },
             getURL: function () { return url; },
             getLastQuery: function () { return lastQuery; },
@@ -844,45 +886,100 @@ RDF = {
         }
     },
 
-    QueryDB: function (sparqlInterface, slaveDB, cacheSize) {
+    QueryDB: function (sparqlInterface, slaveDB, cacheSize, queryDelay) {
+        slaveDB.unordered();
         return {
             _: 'QueryDB',
             sparqlInterface: sparqlInterface,
             slaveDB: slaveDB,
             cacheSize: cacheSize,
-            r: null,
+            queryDelay: queryDelay,
             queryStack: [],
             _seen: 0,
             cache: {},
-            LRU: [],
+            LRU: [], // The Least Recently Used subject is at LRU[0].
             nodes: [],
             triplesMatching: function (s, p, o) {
-                var queryDB = this;
-                function query () {
-                    var isSPO = (s && p && !o);
-                    if (isSPO) {
-                        queryDB.LRU.push(s.toString());
-                        queryDB.nodes.push(s);
-                        if (queryDB.LRU.length > queryDB.cacheSize) {
-                            queryDB.LRU.shift();
-                            queryDB.slaveDB.retract({s:queryDB.nodes.shift(), p:null, o:null});
+                throw "QueryDB.triplesMatching not implemented";
+            },
+            triplesMatching_async: function (s, p, o, validatorStuff) {
+                var _queryDB = this;
+                var cacheSubject = (s && p && !o && cacheSize != 0);
+                var sStr = s.toString();
+                var cachedAt = cacheSubject ? this.LRU.indexOf(sStr) : -1;
+                if (cachedAt != -1) {
+                    // We've already cached this subject in slaveDB. Push to top of LRU.
+                    this.LRU.splice(cachedAt,1);
+                    this.LRU.push(sStr);
+                    var node = this.nodes.splice(cachedAt,1)[0];
+                    this.nodes.push(node);
+                    return node[1].then(function () {
+                        return _queryDB.slaveDB.triplesMatching(s, p, o);
+                    });
+                } else {
+                    var context = '';
+                    if (s._ === "BNode") {
+                        var t = validatorStuff.pointStack; // for readability
+                        for (var i = t.length-1; i && t[i][1]._ === "BNode"; --i) {
+                            context +=
+                                (t[i-1][1]._ === "IRI" ? t[i-1][1].toString() : ("?s"+i))+
+                                " "+t[i][0].toString()+
+                                " ?s"+(i-1)+" .\n";
                         }
                     }
-                    var pattern = "CONSTRUCT WHERE {" +
-                        " " + (s ? s.toString() : "?s") +
-                        " " + (!isSPO && p ? p.toString() : "?p") +
+                    var pattern = "CONSTRUCT WHERE {" + context +
+                        " " + (s ? (s._ === "BNode" ? "?s0" : sStr) : "?s") +
+                        " " + (!cacheSubject && p ? p.toString() : "?p") +
                         " " + (o ? o.toString() : "?o") +
                         " }";
-                    queryDB.sparqlInterface.execute(pattern, {async: false, done: function (r) {
-                        queryDB.r = r;
-                    }});
-                    var ret = queryDB.r.obj.slice();
-                    this._seen += ret.length;
-                    ret.forEach(function (t) { queryDB.slaveDB.push(t); });
+                    // console.log(pattern);
+                    var results;
+                    var p1 = _queryDB.queryDelay ?
+                        new Promise(function (resolve) {
+                            setTimeout(function () {
+                                resolve();
+                            }, _queryDB.queryDelay)
+                        }).then(function () {
+                                return _queryDB.sparqlInterface.execute(pattern, {async: true, done: function (r) {
+                                    results = r;
+                                }});
+                            }) :
+                        _queryDB.sparqlInterface.execute(pattern, {async: true, done: function (r) {
+                            results = r;
+                        }});
+                    var p2 = p1.then(function (results) {
+                        var ret = results.obj.slice();
+                        _queryDB._seen += ret.length;
+                        if (cacheSubject) {
+                            ret.forEach(function (t) { _queryDB.slaveDB.push(t); });
+                            return _queryDB.slaveDB.triplesMatching(s, p, o);
+                        } else {
+                            return ret;
+                        }
+                    }).catch(function (pair) {
+                        var body = pair[0], jqXHR = pair[1];
+                        throw RDF.StructuredError(
+                            [["text", "failed to GET "],
+                                ["code", pattern],
+                                ["text", " from " + _queryDB.sparqlInterface.getURL()]
+                            ]);
+                    });
+                    if (cacheSubject) {
+                        this.LRU.push(sStr);
+                        this.nodes.push([s, p1]);
+                        if (this.LRU.length > this.cacheSize) {
+                            // Shift from the bottom of LRU.
+                            this.LRU.shift();
+                            var node = this.nodes.shift()[0];
+                            p2 = p2.then(function (res) {
+                                // Queue removal from slave DB.
+                                _queryDB.slaveDB.retract({s:node, p:null, o:null});
+                                return res;
+                            });
+                        }
+                    }
+                    return p2;
                 }
-                if (!s || !p || o || this.LRU.indexOf(s.toString()) == -1)
-                    query();
-                return this.slaveDB.triplesMatching(s, p, o);
             },
             triplesMatching_str: function (s, p, o) {
                 throw "QueryDB.triplesMatching_str not implemented";
@@ -1149,14 +1246,17 @@ RDF = {
             this.validate = function (schema, rule, t, point, db, validatorStuff) {
                 var ret = new RDF.ValRes();
                 schema.dispatch('enter', rule.codes, rule, t);
-                var r = schema.validatePoint(point, this.label, db, validatorStuff, true);
-                schema.dispatch('exit', rule.codes, rule, r);
-                ret.status = r.status;
-                if (r.passed())
-                { ret.status = r.status; ret.matchedTree(rule, t, r); }
-                else
-                { ret.status = RDF.DISPOSITION.FAIL; ret.error_noMatchTree(rule, t, r); }
-                return ret;
+                var nestedValidatorStuff = validatorStuff.push(point, rule.nameClass.term);
+                return schema.validatePoint(point, this.label, db, nestedValidatorStuff, true).
+                    then(function (r) {
+                        schema.dispatch('exit', rule.codes, rule, r);
+                        ret.status = r.status;
+                        if (r.passed())
+                        { ret.status = r.status; ret.matchedTree(rule, t, r); }
+                        else
+                        { ret.status = RDF.DISPOSITION.FAIL; ret.error_noMatchTree(rule, t, r); }
+                        return ret;
+                    });
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1266,7 +1366,7 @@ RDF = {
                     ret.status = RDF.DISPOSITION.FAIL;
                     ret.error_noMatch(rule, t);
                 }
-                return ret;
+                return Promise.resolve(ret);
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1329,7 +1429,7 @@ RDF = {
                         passIf(point.datatype.toString() == this.type.toString());
                     }
                 } else { ret.status = RDF.DISPOSITION.FAIL; ret.error_noMatch(rule, t); }
-                return ret;
+                return Promise.resolve(ret);
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1372,14 +1472,24 @@ RDF = {
             return '(' + this.values.map(function (v) { return v.toString(orig); }).join(' ') + ')';
         },
             this.validate = function (schema, rule, t, point, db, validatorStuff) {
-                for (var i = 0; i < this.values.length; ++i) {
-                    var ret1 = this.values[i].validate(schema, rule, t, point, db, validatorStuff);
-                    if (ret1.status == RDF.DISPOSITION.PASS)
-                        return ret1;
-                }
-                var ret2 = new RDF.ValRes();
-                { ret2.status = RDF.DISPOSITION.FAIL; ret2.error_noMatch(rule, t); }
-                return ret2;
+                var _ValueSet = this;
+                var ret = null;
+                return Promise.all(this.values.map(function (value) {
+                    return value.validate(schema, rule, t, point, db, validatorStuff).
+                        then(function (ret1) {
+                            if (ret1.status == RDF.DISPOSITION.PASS)
+                                ret = ret1;
+                        });
+                })).
+                    then(function () {
+                        if (ret)
+                            return ret;
+                        else {
+                            var ret2 = new RDF.ValRes();
+                            { ret2.status = RDF.DISPOSITION.FAIL; ret2.error_noMatch(rule, t); }
+                            return Promise.resolve(ret2);
+                        }
+                    });
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1427,12 +1537,12 @@ RDF = {
                     if (this.exclusions[i].matches(point)) {
                         var ret1 = new RDF.ValRes();
                         { ret1.status = RDF.DISPOSITION.FAIL; ret1.error_noMatch(rule, t); }
-                        return ret1;
+                        return Promise.resolve(ret1);
                     }
                 }
                 var ret2 = new RDF.ValRes();
                 { ret2.status = RDF.DISPOSITION.PASS; ret2.matched(rule, t); }
-                return ret2;
+                return Promise.resolve(ret2);
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1475,17 +1585,17 @@ RDF = {
                     if (this.exclusions[i].toString() === point.toString()) {
                         var ret1 = new RDF.ValRes();
                         { ret1.status = RDF.DISPOSITION.FAIL; ret1.error_noMatch(rule, t); }
-                        return ret1;
+                        return Promise.resolve(ret1);
                     }
                 }
                 if (point.lex.substr(0,this.term.lex.length) !== this.term.lex) {
                     var ret2 = new RDF.ValRes();
                     { ret2.status = RDF.DISPOSITION.FAIL; ret2.error_noMatch(rule, t); }
-                    return ret2;
+                    return Promise.resolve(ret2);
                 }
                 var ret3 = new RDF.ValRes();
                 { ret3.status = RDF.DISPOSITION.PASS; ret3.matched(rule, t); }
-                return ret3;
+                return Promise.resolve(ret3);
             },
             this.SPARQLobject = function (prefixes) {
                 return "?o";
@@ -1522,8 +1632,8 @@ RDF = {
             };
     },
 
-    AtomicRule: function (negated, reversed, nameClass, valueClass, min, max, codes, _pos) {
-        this._ = 'AtomicRule'; this.negated = negated; this.reversed = reversed; this.nameClass = nameClass; this.valueClass = valueClass; this.min = min; this.max = max; this.codes = codes; this._pos = _pos;
+    AtomicRule: function (negated, reversed, additive, nameClass, valueClass, min, max, codes, _pos) {
+        this._ = 'AtomicRule'; this.negated = negated; this.reversed = reversed; this.additive = additive; this.nameClass = nameClass; this.valueClass = valueClass; this.min = min; this.max = max; this.codes = codes; this._pos = _pos;
         this.ruleID = undefined;
         this.setRuleID = function (ruleID) { this.ruleID = ruleID; };
         this.label = undefined;
@@ -1575,63 +1685,84 @@ RDF = {
             var ret = new RDF.ValRes();
             ret.status = RDF.DISPOSITION.PASS;
             var _AtomicRule = this;
-            var matchName = db.triplesMatching(this.reversed ? null : point,
+            return db.triplesMatching_async(this.reversed ? null : point,
                 this.nameClass._ === 'NameTerm' ? this.nameClass.term : null,
-                this.reversed ? point : null).filter(function (t) {
-                    return _AtomicRule.nameClass.match(t.p);
+                this.reversed ? point : null,
+                validatorStuff).
+                then(function (matchName) {
+                    matchName = matchName.filter(function (t) {
+                        return _AtomicRule.nameClass.match(t.p);
+                    });
+                    var pet = null;
+                    if (inOpt && matchName.length === 0)
+                    { ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE; ret.matchedEmpty(_AtomicRule);
+                        pet = Promise.resolve(ret);
+                    }
+                    else if (matchName.length < _AtomicRule.min)
+                    { ret.status = RDF.DISPOSITION.FAIL; ret.error_belowMin(_AtomicRule.min, _AtomicRule);
+                        pet = Promise.resolve(ret);
+                    }
+                    //             else if (matchName.length > _AtomicRule.max)
+                    //                 { ret.status = RDF.DISPOSITION.FAIL; ret.error_aboveMax(_AtomicRule.max, _AtomicRule, matchName[_AtomicRule.max]); }
+                    else {
+                        var passes = [];
+                        var fails = [];
+                        var promises = [];
+                        matchName.forEach(function (t) {
+                            if (_AtomicRule.valueClass._ == 'ValueReference')
+                                schema.dispatch('link', _AtomicRule.codes, null, t);
+                            var px = _AtomicRule.valueClass.validate(schema, _AtomicRule, t, _AtomicRule.reversed ? t.s : t.o, db, validatorStuff);
+                            px.
+                                then(function (r) {
+                                    if (_AtomicRule.valueClass._ != 'ValueReference')
+                                        schema.dispatch('visit', _AtomicRule.codes, r, t);
+                                    if (!r.passed() ||
+                                        schema.dispatch('post', _AtomicRule.codes, r, t) == RDF.DISPOSITION.FAIL)
+                                        fails.push({t:t, r:r});
+                                    else
+                                        passes.push({t:t, r:r});
+                                })
+                            promises.push(px
+                            );
+                        });
+                        pet = Promise.all(promises).then(function () {
+                            if (inOpt && passes.length === 0) {
+                                ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE;
+                                ret.matchedEmpty(_AtomicRule);
+                            } else if (passes.length < _AtomicRule.min) {
+                                ret.status = RDF.DISPOSITION.FAIL;
+                                ret.error_belowMin(_AtomicRule.min, _AtomicRule);
+                            } else if (_AtomicRule.max !== null && passes.length > _AtomicRule.max) {
+                                ret.status = RDF.DISPOSITION.FAIL;
+                                ret.error_aboveMax(_AtomicRule.max, _AtomicRule, passes[_AtomicRule.max].r);
+                            }
+                            if (ret.status == RDF.DISPOSITION.FAIL) {
+                                for (var iFails1 = 0; iFails1 < fails.length; ++iFails1)
+                                    ret.add(fails[iFails1].r);
+                            } else {
+                                for (var iPasses = 0; iPasses < passes.length; ++iPasses)
+                                    ret.add(passes[iPasses].r);
+                                for (var iFails2 = 0; iFails2 < fails.length; ++iFails2)
+                                    if (!_AtomicRule.additive)
+                                        ret.missed(fails[iFails2].r);
+                            }
+                            return ret;
+                        });
+                    }
+                    pet.then(function () {
+                        if (_AtomicRule.negated) {
+                            if (ret.status == RDF.DISPOSITION.FAIL) {
+                                ret.status = RDF.DISPOSITION.PASS;
+                                ret.errors = [];
+                            } else if (ret.status == RDF.DISPOSITION.PASS) {
+                                ret.status = RDF.DISPOSITION.FAIL;
+                                ret.error_aboveMax(0, _AtomicRule, matchName[0]); // !! take a triple from passes
+                            }
+                        }
+                        return ret;
+                    });
+                    return pet;
                 });
-            if (inOpt && matchName.length === 0)
-            { ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE; ret.matchedEmpty(this); }
-            else if (matchName.length < this.min)
-            { ret.status = RDF.DISPOSITION.FAIL; ret.error_belowMin(this.min, this); }
-//             else if (matchName.length > this.max)
-//                 { ret.status = RDF.DISPOSITION.FAIL; ret.error_aboveMax(this.max, this, matchName[this.max]); }
-            else {
-                var passes = [];
-                var fails = [];
-                for (var i = 0; i < matchName.length; ++i) {
-                    var t = matchName[i];
-                    if (this.valueClass._ == 'ValueReference')
-                        schema.dispatch('link', this.codes, r, t);
-                    var r = this.valueClass.validate(schema, this, t, this.reversed ? t.s : t.o, db, validatorStuff);
-                    if (this.valueClass._ != 'ValueReference')
-                        schema.dispatch('visit', this.codes, r, t);
-                    if (!r.passed() ||
-                        schema.dispatch('post', this.codes, r, t) == RDF.DISPOSITION.FAIL)
-                        fails.push({t:t, r:r});
-                    else
-                        passes.push({t:t, r:r});
-                }
-                if (inOpt && passes.length === 0) {
-                    ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE;
-                    ret.matchedEmpty(this);
-                } else if (passes.length < this.min) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.error_belowMin(this.min, this);
-                } else if (this.max !== null && passes.length > this.max) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.error_aboveMax(this.max, this, passes[this.max].r);
-                }
-                if (ret.status == RDF.DISPOSITION.FAIL) {
-                    for (var iFails1 = 0; iFails1 < fails.length; ++iFails1)
-                        ret.add(fails[iFails1].r);
-                } else {
-                    for (var iPasses = 0; iPasses < passes.length; ++iPasses)
-                        ret.add(passes[iPasses].r);
-                    for (var iFails2 = 0; iFails2 < fails.length; ++iFails2)
-                        ret.missed(fails[iFails2].r);
-                }
-            }
-            if (this.negated) {
-                if (ret.status == RDF.DISPOSITION.FAIL) {
-                    ret.status = RDF.DISPOSITION.PASS;
-                    ret.errors = [];
-                } else if (ret.status == RDF.DISPOSITION.PASS) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.error_aboveMax(0, this, matchName[0]); // !! take a triple from passes
-                }
-            }
-            return ret;
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
             var lead = pad(depth, '    ');
@@ -1793,39 +1924,49 @@ RDF = {
             var seen = {};
             var matchName = db.uniqueSubjects();
             if (inOpt && matchName.length === 0)
-            { ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE; ret.matchedEmpty(this); }
+            { ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE; ret.matchedEmpty(this);
+                return Promise.resolve(ret);
+            }
             else if (matchName.length < this.min)
-            { ret.status = RDF.DISPOSITION.FAIL; ret.error_belowMin(this.min, this); }
+            { ret.status = RDF.DISPOSITION.FAIL; ret.error_belowMin(this.min, this);
+                return Promise.resolve(ret);
+            }
 //             else if (matchName.length > this.max)
 //                 { ret.status = RDF.DISPOSITION.FAIL; ret.error_aboveMax(this.max, this, matchName[this.max]); }
             else {
                 var passes = [];
+                var promises = [];
                 for (var iMatches = 0; iMatches < matchName.length; ++iMatches) {
                     var s = matchName[iMatches];
                     var p = RDF.IRI("http://www.w3.org/2013/ShEx/Definition#concomitantRelation");
                     var t = RDF.Triple(point, p, s); // make up connecting triple for reporting
                     if (this.valueClass._ == 'ValueReference')
                         schema.dispatch('link', this.codes, r, t);
-                    var r = this.valueClass.validate(schema, this, t, s, db, validatorStuff);
-                    if (this.valueClass._ != 'ValueReference')
-                        schema.dispatch('visit', this.codes, r, t);
-                    if (r.passed() &&
-                        schema.dispatch('post', this.codes, r, t) != RDF.DISPOSITION.FAIL)
-                        passes.push({t:t, r:r});
+                    promises.push(this.valueClass.validate(schema, this, t, s, db, validatorStuff).
+                        then(function (v) {
+                            if (this.valueClass._ != 'ValueReference')
+                                schema.dispatch('visit', this.codes, r, t);
+                            if (r.passed() &&
+                                schema.dispatch('post', this.codes, r, t) != RDF.DISPOSITION.FAIL)
+                                passes.push({t:t, r:r});
+                        }));
                 }
-                if (inOpt && passes.length === 0) {
-                    ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE;
-                    ret.matchedEmpty(this);
-                } else if (passes.length < this.min) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.error_belowMin(this.min, this);
-                } else if (this.max !== null && passes.length > this.max) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.error_aboveMax(this.max, this, passes[this.max].r);
-                }
-                if (ret.status != RDF.DISPOSITION.FAIL)
-                    for (var iPasses = 0; iPasses < passes.length; ++iPasses)
-                        ret.add(passes[iPasses].r);
+                return Promise.all(function () {
+                    if (inOpt && passes.length === 0) {
+                        ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE;
+                        ret.matchedEmpty(this);
+                    } else if (passes.length < this.min) {
+                        ret.status = RDF.DISPOSITION.FAIL;
+                        ret.error_belowMin(this.min, this);
+                    } else if (this.max !== null && passes.length > this.max) {
+                        ret.status = RDF.DISPOSITION.FAIL;
+                        ret.error_aboveMax(this.max, this, passes[this.max].r);
+                    }
+                    if (ret.status != RDF.DISPOSITION.FAIL)
+                        for (var iPasses = 0; iPasses < passes.length; ++iPasses)
+                            ret.add(passes[iPasses].r);
+                    return ret;
+                });
             }
             return ret;
         };
@@ -1969,19 +2110,21 @@ RDF = {
         // if(∅) {if(inOpt) return ∅ else if (opt) return 𝕡 else return 𝕗}; return dispatch('post', );
         this.validate = function (schema, point, inOpt, db, validatorStuff) {
             schema.dispatch('enter', this.codes, this, {o:point}); // !! lie! it's the *subject*!
-            var v = this.rule.validate(schema, point, inOpt || this.opt, db, validatorStuff);
-            schema.dispatch('exit', this.codes, this, null);
-            if (v.status == RDF.DISPOSITION.FAIL || v.status == RDF.DISPOSITION.ZERO)
-                ; // v.status = RDF.DISPOSITION.FAIL; -- avoid dispatch below
-            else if (v.status == RDF.DISPOSITION.NONE) {
-                // if (inOpt) v.status = RDF.DISPOSITION.NONE; else
-                if (this.opt)
-                    v.status = RDF.DISPOSITION.PASS;
-                else
-                    v.status = RDF.DISPOSITION.FAIL;
-            } else if (v.status != RDF.DISPOSITION.FAIL)
-                v.status = schema.dispatch('post', this.codes, v, v.matches);
-            return v;
+            return this.rule.validate(schema, point, inOpt || this.opt, db, validatorStuff).
+                then(function (v) {
+                    schema.dispatch('exit', this.codes, this, null);
+                    if (v.status == RDF.DISPOSITION.FAIL || v.status == RDF.DISPOSITION.ZERO)
+                        ; // v.status = RDF.DISPOSITION.FAIL; -- avoid dispatch below
+                    else if (v.status == RDF.DISPOSITION.NONE) {
+                        // if (inOpt) v.status = RDF.DISPOSITION.NONE; else
+                        if (this.opt)
+                            v.status = RDF.DISPOSITION.PASS;
+                        else
+                            v.status = RDF.DISPOSITION.FAIL;
+                    } else if (v.status != RDF.DISPOSITION.FAIL)
+                        v.status = schema.dispatch('post', this.codes, v, v.matches);
+                    return v;
+                });
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
             var lead = pad(depth, '    ');
@@ -2108,7 +2251,7 @@ RDF = {
         this.validate = function (schema, point, inOpt, db, validatorStuff) {
             var ret = new RDF.ValRes();
             ret.status = inOpt ? RDF.DISPOSITION.NONE : RDF.DISPOSITION.PASS; // nod agreeably
-            return ret;
+            return Promise.resolve(ret);
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
             return new RDF.QueryClause(undefined, "");
@@ -2165,30 +2308,36 @@ RDF = {
             var allPass = RDF.DISPOSITION.PASS;
             var passes = [];
             var empties = [];
+            var promises = [];
             for (var i = 0; i < this.conjoints.length; ++i) {
                 var conj = this.conjoints[i];
-                var r = conj.validate(schema, point, inOpt, db, validatorStuff);
-                ret.add(r);
-                if (r.status == RDF.DISPOSITION.FAIL)
-                    seenFail = true;
-                if (r.status == RDF.DISPOSITION.PASS)
-                // seenPass = true;
-                    passes.push(r);
-                else
-                    allPass = RDF.DISPOSITION.NONE;
-                if (r.status == RDF.DISPOSITION.NONE)
-                // seenEmpty = true;
-                    empties.push(r);
+                promises.push(conj.validate(schema, point, inOpt, db, validatorStuff).
+                        then(function (r) {
+                            ret.add(r);
+                            if (r.status == RDF.DISPOSITION.FAIL)
+                                seenFail = true;
+                            if (r.status == RDF.DISPOSITION.PASS)
+                            // seenPass = true;
+                                passes.push(r);
+                            else
+                                allPass = RDF.DISPOSITION.NONE;
+                            if (r.status == RDF.DISPOSITION.NONE)
+                            // seenEmpty = true;
+                                empties.push(r);
+                        })
+                );
             }
-            if (passes.length && empties.length) //
-            { ret.status = RDF.DISPOSITION.FAIL; ret.error_mixedOpt(passes, empties, this); }
-            else if (seenFail)
-                ret.status = RDF.DISPOSITION.FAIL;
-            else if (!passes.length && !empties.length)
-                ret.status = RDF.DISPOSITION.ZERO;
-            else
-                ret.status = allPass;
-            return ret;
+            return Promise.all(promises).then(function () {
+                if (passes.length && empties.length)
+                { ret.status = RDF.DISPOSITION.FAIL; ret.error_mixedOpt(passes, empties, this); }
+                else if (seenFail)
+                    ret.status = RDF.DISPOSITION.FAIL;
+                else if (!passes.length && !empties.length)
+                    ret.status = RDF.DISPOSITION.ZERO;
+                else
+                    ret.status = allPass;
+                return ret;
+            });
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
             var ret = '';
@@ -2318,31 +2467,36 @@ RDF = {
             var passCount = 0;
             var indefCount = 0;
             var failures = [];
+            var promises = [];
             for (var i = 0; i < this.disjoints.length; ++i) {
                 var disj = this.disjoints[i];
-                var r = disj.validate(schema, point, inOpt, db, validatorStuff);
-                if (r.status == RDF.DISPOSITION.FAIL)
-                    failures.push(r);
-                else {
-                    allErrors = false;
-                    ret.add(r);
-                    if (r.status == RDF.DISPOSITION.PASS)
-                        ++passCount;
-                    else if (r.status == RDF.DISPOSITION.ZERO)
-                        ++indefCount;
-                }
+                promises.push(disj.validate(schema, point, inOpt, db, validatorStuff).
+                    then(function (r) {
+                        if (r.status == RDF.DISPOSITION.FAIL)
+                            failures.push(r);
+                        else {
+                            allErrors = false;
+                            ret.add(r);
+                            if (r.status == RDF.DISPOSITION.PASS)
+                                ++passCount;
+                            else if (r.status == RDF.DISPOSITION.ZERO)
+                                ++indefCount;
+                        }
+                    }));
             }
-            if (allErrors || passCount > 1)
-                ret.status = RDF.DISPOSITION.FAIL;
-            else if (passCount)
-                ret.status = RDF.DISPOSITION.PASS;
-            else if (indefCount)
-                ret.status = RDF.DISPOSITION.ZERO;
-            else
-                ret.status = RDF.DISPOSITION.FAIL;
-            if (ret.status === RDF.DISPOSITION.FAIL)
-                ret.error_or(failures, this);
-            return ret;
+            return Promise.all(promises).then(function () {
+                if (allErrors || passCount > 1)
+                    ret.status = RDF.DISPOSITION.FAIL;
+                else if (passCount)
+                    ret.status = RDF.DISPOSITION.PASS;
+                else if (indefCount)
+                    ret.status = RDF.DISPOSITION.ZERO;
+                else
+                    ret.status = RDF.DISPOSITION.FAIL;
+                if (ret.status === RDF.DISPOSITION.FAIL)
+                    ret.error_or(failures, this);
+                return ret;
+            });
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
             var lead1 = pad(depth, '    ');
@@ -3346,51 +3500,54 @@ RDF = {
             if (!(asStr in this.ruleMap))
                 throw "rule " + asStr + " not found in schema";
             var key = point.toString() + ' @' + asStr + "," + subShapes;
-            var ret = this.termResults[key];
-            if (ret === undefined) {
+            var p = this.termResults[key];
+            if (p === undefined) {
                 this.termResults[key] = new RDF.ValRes(); // temporary empty solution
                 this.termResults[key].status = RDF.DISPOSITION.PASS; // matchedEmpty(this.ruleMap[asStr]);
 
                 var closedSubGraph;
                 if (validatorStuff.closedShapes)
-                    closedSubGraph = db.triplesMatching(point, null, null);
+                    closedSubGraph = db.triplesMatching(point, null, null); // !!!
 
                 var rule = subShapes ? this.getRuleMapClosure(as) : this.ruleMap[asStr];
-
-                ret = rule.validate(this, point, false, db, validatorStuff);
+                p = rule.validate(this, point, false, db, validatorStuff);
 
                 // Make sure we used all of the closedSubGraph.
-                if (validatorStuff.closedShapes && ret.passed()) {
-                    var remaining = closedSubGraph.filter(function (t) {
-                        var r = ret.triples();
-                        for (var i = 0; i < r.length; ++i)
-                            if (r[i] === t)
-                                return false;
-                        return true;
-                    });
-                    if (remaining.length)
-                    { ret.status = RDF.DISPOSITION.FAIL; ret.error_noMatchExtra(rule, remaining); }
-                }
-                this.termResults[key] = ret;
+                p.then(function (ret) {
+                    if (validatorStuff.closedShapes && ret.passed()) {
+                        var remaining = closedSubGraph.filter(function (t) {
+                            var r = ret.triples();
+                            for (var i = 0; i < r.length; ++i)
+                                if (r[i] === t)
+                                    return false;
+                            return true;
+                        });
+                        if (remaining.length)
+                        { ret.status = RDF.DISPOSITION.FAIL; ret.error_noMatchExtra(rule, remaining); }
+                    }
+                });
+                this.termResults[key] = p;
             }
-            return ret;
+            return p;
         };
 
         this.closeShapes = function (point, as, db, validatorStuff, subShapes) {
-            var ret = this.validatePoint(point, as, db, validatorStuff, subShapes);
-            if (ret.status == RDF.DISPOSITION.PASS) {
-                var seen = ret.triples();
-                var missed = ret.misses.filter(function (m) { // triplesMatch
-                    return seen.filter(function (t) {
-                        return m.triple.toString() == t.toString();
-                    }).length ? false : true;
-                })
-                if (missed.length) {
-                    ret.status = RDF.DISPOSITION.FAIL;
-                    ret.errors = missed;
-                }
-            }
-            return ret;
+            return this.validatePoint(point, as, db, validatorStuff, subShapes).
+                then(function (ret) {
+                    if (ret.status == RDF.DISPOSITION.PASS) {
+                        var seen = ret.triples();
+                        var missed = ret.misses.filter(function (m) { // triplesMatch
+                            return seen.filter(function (t) {
+                                return m.triple.toString() == t.toString();
+                            }).length ? false : true;
+                        })
+                        if (missed.length) {
+                            ret.status = RDF.DISPOSITION.FAIL;
+                            ret.errors = missed;
+                        }
+                    }
+                    return ret;
+                });
         };
 
         // usual interface for validating a pointed graph
@@ -3409,53 +3566,61 @@ RDF = {
                     }
                 }
             });
-            var ret = this.closeShapes(point, as, db, validatorStuff, subShapes);
-            this.dispatch('end', this.init, null, ret);
-            return ret;
+            var schema = this;
+            return this.closeShapes(point, as, db, validatorStuff, subShapes).then(function (ret) {
+                schema.dispatch('end', this.init, null, ret);
+                return ret;
+            });
         };
 
         // usual interface for finding types in a graph
-        this.findTypes = function (db, validatorStuff) {
+        this.findTypes = function (db, subjects, validatorStuff) {
             var ret = new RDF.ValRes(); // accumulate validation successes.
             ret.status = RDF.DISPOSITION.PASS;
 
-            // Get all of the subject nodes.
-            // Note that this dataset has different objects for each
-            // lexical instantiation of an RDF node so we key on
-            // the string (N-Triples) representations.
-            var subjects = db.uniqueSubjects();
             for (var handler in this.handlers)
                 if ('beginFindTypes' in this.handlers[handler])
                     this.handlers[handler]['beginFindTypes']();
             // For each (distinct) subject node s,
-            for (var iSubjects = 0; iSubjects < subjects.length; ++ iSubjects) {
-                var s = subjects[iSubjects];
-
+            var promises = [];
+            var schema = this;
+            subjects.map(function (s) {
                 // for each rule label ruleLabel,
-                for (var ri = 0; ri < this.ruleLabels.length; ++ri) {
-                    var ruleLabel = this.ruleLabels[ri];
+                schema.ruleLabels.map(function (ruleLabel) {
 
                     // if the labeled rule not VIRTUAL,
-                    if (!this.isVirtualShape[ruleLabel.toString()]) {
+                    if (!schema.isVirtualShape[ruleLabel.toString()]) {
 
-                        var closedSubGraph = db.triplesMatching(s, null, null);
-                        var res = this.validate(s, ruleLabel, db, validatorStuff, false);
+                        // var closedSubGraph = db.triplesMatching(s, null, null);
 
-                        // If it passed or is indeterminate,
-                        if (res.status !== RDF.DISPOSITION.FAIL) {
+                        var instSh = RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0());
+                        var nestedValidatorStuff = validatorStuff.push(s, instSh);
+                        var p2 = schema.validate(s, ruleLabel, db, nestedValidatorStuff, false);
+                        p2.then(function (res) {
+                            // If it passed or is indeterminate,
+                            if (res.status !== RDF.DISPOSITION.FAIL) {
 
-                            // record the success.
-                            RDF.message(s.toString() + " is a " + ruleLabel.toString());
-                            var t = RDF.Triple(RDF.IRI(s), RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0()), ruleLabel);
-                            ret.matchedTree(this.ruleMap[ruleLabel], t, res);
-                        }
+                                // record the success.
+                                RDF.message(s.toString() + " is a " + ruleLabel.toString());
+                                var t = RDF.Triple(s, RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0()), ruleLabel);
+                                ret.matchedTree(schema.ruleMap[ruleLabel], t, res);
+                            }
+                        }).catch(function (e) {
+                            console.dir(e);
+                            $("#validation-messages").append($('<div/>'
+                            + "<span class='error'>"+e+"</span>"
+                            + "<br/>"));
+                        });
+                        promises.push(p2);
                     }
-                }
-            }
-            for (var handler in this.handlers)
-                if ('endFindTypes' in this.handlers[handler])
-                    this.handlers[handler]['endFindTypes']();
-            return ret;
+                });
+            });
+            return Promise.all(promises).then(function () {
+                for (var handler in schema.handlers)
+                    if ('endFindTypes' in schema.handlers[handler])
+                        schema.handlers[handler]['endFindTypes']();
+                return ret;
+            });
         };
         this.dispatch = function (event, codes, valRes, context) {
             var handlers = this.handlers;
@@ -3716,7 +3881,8 @@ SELECT ?s ?p ?o {\n\
             var to;
             if (triple) {
                 var ts = triple.toString();
-                tOrdinal = dataIdMap.getInt(ts);
+                // May be called with no renderable data.
+                tOrdinal = dataIdMap ? dataIdMap.getInt(ts) : null;
                 var to = triple.s.toString(true) + " " + triple.p.toString(true) + " " + triple.o.toString(true) + " .";
                 solutions.push({rule:rOrdinal, triple:tOrdinal});
             } else {
@@ -4052,7 +4218,24 @@ SELECT ?s ?p ?o {\n\
                 ret += this.matches.map(function (m) { return m.toHTML(depth+1, schemaIdMap, dataIdMap, solutions, classNames); }).join("\n");
                 return ret + "\n" + p + "}";
             }
-    }
+    },
+
+    ValidatorStuff: function (iriResolver, closedShapes) {
+        return {
+            _: 'ValidatorStuff',
+            iriResolver: iriResolver,
+            closedShapes: closedShapes,
+            pointStack: [],
+            push: function (node, predicate) {
+                var nestedValidatorStuff = RDF.ValidatorStuff(this.iriResolver, this.closedShapes);
+                this.pointStack.forEach(function (elt) {
+                    nestedValidatorStuff.pointStack.push(elt);
+                });
+                nestedValidatorStuff.pointStack.push([predicate, node]);
+                return nestedValidatorStuff;
+            }
+        };
+    },
 
 //    curSchema: new this.Schema()
 };
@@ -4062,5 +4245,6 @@ RDF.IRI.prototype.origText = origText;
 RDF.RDFLiteral.prototype.origText = origText;
 RDF.LangTag.prototype.origText = origText;
 RDF.BNode.prototype.origText = origText;
+
 
 module.exports = RDF;
