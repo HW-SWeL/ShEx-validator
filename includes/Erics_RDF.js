@@ -1,4 +1,4 @@
-var Promise = require("Promise");
+var Promise = require("promise");
 
 function pad (d, str) {
     if (str === undefined) str = '  ';
