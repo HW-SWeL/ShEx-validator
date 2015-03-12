@@ -7,29 +7,31 @@ function findShapes(schema, schemaResolver, db, closedShapes, findShapesResult) 
 
     var shapes = schema.findTypes(
         db,
-        {
-            iriResolver: schemaResolver,
-            closedShapes: closedShapes
-        }
+        db.uniqueSubjects(),
+        []
     );
 
-    findShapesResult(cleanShapes(shapes, db));
+    return cleanShapes(shapes, db, findShapesResult);
 
 }
 
-function cleanShapes(shapes, db) {
+function cleanShapes(shapes, db, findShapesResult) {
 
-    var result = {};
+    return shapes.then(function(shapes) {
+        var result = {};
 
-    db.uniqueSubjects().forEach(function(subject) {
-        result[subject] = null;
+        db.uniqueSubjects().forEach(function(subject) {
+            result[subject] = null;
+        });
+
+        shapes.matches.forEach(function(match) {
+            result[match.triple.s.toString()] = match.triple.o.toString();
+        });
+
+        findShapesResult(result);
     });
 
-    shapes.matches.forEach(function(match) {
-        result[match.triple.s.lex] = match.triple.o.toString();
-    });
 
-    return result;
 }
 
 module.exports.findShapes = findShapes
