@@ -1,6 +1,6 @@
 var RDF = require('./includes/Erics_RDF.js');
 
-function formatError(startingShape,fail) {
+function formatError(fail) {
     var rule;
     if(fail.rule.valueClass._ === "ValueSet")
         rule = RDF.Triple(fail.rule.label, fail.rule.nameClass.term, fail.rule.valueClass.values[0].term);
@@ -10,7 +10,7 @@ function formatError(startingShape,fail) {
     return {
         name: fail._,
         triple : rule
-    }
+    };
 }
 
 module.exports = formatError;
