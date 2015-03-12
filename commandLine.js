@@ -79,14 +79,14 @@ function processCommandLine(argv) {
 
     var callbacks = {
         schemaParsed: function (schema) {
-            out("Schema Parsed: " + schema.shapeDefinitions.length + " shape definitions.");
+            out("Schema Parsed: " + schema.shapes.length + " shapes.");
         },
         schemaParseError: function (errorMessage) {
             error(errorMessage);
             //exit(exitCodes.schemaParseError);
         },
         dataParsed: function (data) {
-            out("Data Parsed: " + data.shapes.length + " shapes and " + data.triples.length + " triples.");
+            out("Data Parsed: " + data.resources.length + " resources and " + data.triples.length + " triples.");
         },
         dataParseError: function (errorMessage) {
             error("Data Parse Error:");
@@ -97,11 +97,11 @@ function processCommandLine(argv) {
             if (argv.F)
                 validator.validate(shapes).done();
             else {
-                for (var shape in shapes) {
-                    if (shapes[shape])
-                        out(shape + " Is a " + shapes[shape]);
+                for (var resource in shapes) {
+                    if (shapes[resource])
+                        out(resource + " Is a " + shapes[resource]);
                     else
-                        error(shape + " Could not be found");
+                        error(resource + " Could not be found");
                 }
             }
 
@@ -128,13 +128,13 @@ function processCommandLine(argv) {
             validator.findShapes().done();
         }
         else {
-            var startingShapes = {};
+            var startingResources = {};
             argv._.slice(2).forEach(function (str) {
                 var parts = str.split("=");
                 if (parts.length !== 2) exitWithUsage();
-                startingShapes[parts[0]] = "<" + parts[1] + ">";
+                startingResources[parts[0]] = "<" + parts[1] + ">";
             });
-            validator.validate(startingShapes).done();
+            validator.validate(startingResources).done();
         }
 
     });

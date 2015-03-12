@@ -54,7 +54,7 @@ function parseWithN3(dataText) {
             }
             else {
                 resolver.Prefixes = prefixes;
-                resolve({db: db, resolver: resolver, shapes: db.uniqueSubjects(), triples:db.triples});
+                resolve({db: db, resolver: resolver, resources: db.uniqueSubjects(), triples:db.triples});
             }
         });
     });

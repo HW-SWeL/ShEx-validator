@@ -1,6 +1,6 @@
 # ShEx-validator [![Build Status](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator.svg?branch=master)](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator)
 
-Parses and a ShEx schema and RDF data file and validates the shapes in the data against the shape definitions in the schema.
+Parses and a ShEx schema and RDF data file and validates the resources in the data against the shapes in the schema.
 
 A standalone Node module with a command line interface and validate() function as described below
 
@@ -19,8 +19,8 @@ var schemaText = "...";
 
 var dataText = "...";
 
-var startingShapes = {
-    "SHAPE" : "SHAPE DEFINITION",
+var startingResources = {
+    "RESOURCE" : "SHAPE",
     ...
 };
 
@@ -41,7 +41,7 @@ var validator = new ShEx.Validator(schemaText, dataText, callbacks, options);
 
 validator.findShapes();
 
-validator.validate(startingShapes);
+validator.validate(startingResources);
 ```
 
 #### Callbacks
@@ -49,17 +49,17 @@ Not nearly finished or perfected but it is the current implementation.
 
 ```js
 schemaParsed = {
-    shapeDefinitions: ["SHAPE NAME", ...]
+    shapes: ["SHAPE", ...]
 }
 
 dataParsed = {
-    shapes: ["SHAPE"],
+    resources: ["RESOURCE"],
     triples: [RDF.Triple]
 }
 
 validationResult = {
     passed: true|false,
-    shape: RDF.RDFLiteral|RDF.IRI,
+    startingResource: RDF.RDFLiteral|RDF.IRI,
     matches: [{
         rule: RDF.Triple,
         triple: RDF.Triple
@@ -71,7 +71,7 @@ validationResult = {
 }
 
 shapeFindingResult = {
-    "SHAPE" : "SHAPE DEFINITION" | null,
+    "RESOURCE" : "SHAPE" | null,
     ...
 };
 
@@ -86,13 +86,13 @@ In future when globally installed:
 
 <!--- BEGIN USAGE -->
     Usage:
-        ShEx-validator [options] SCHEMA DATA SHAPE=SHAPE_DEFINITION [SHAPE=SHAPE_DEFINITION ...]
+        ShEx-validator [options] SCHEMA DATA RESOURCE=SHAPE [RESOURCE=SHAPE ...]
         ShEx-validator [options] SCHEMA DATA -f
 
     Options:
-        -c, --closed-shape  Schema must mention all used shape definitions
+        -c, --closed-shape  All properties must be in shape
         -h, --help          Print usage information
-        -f, --find-shapes   Find and print shape definitions which match the shapes
+        -f, --find-shapes   Find shapes which match the resources
 <!--- END USAGE -->
 
 ## Development
