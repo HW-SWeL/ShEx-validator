@@ -25,7 +25,7 @@ function cleanShapes(shapes, db, findShapesResult) {
         });
 
         shapes.matches.forEach(function(match) {
-            result[match.triple.s.lex] = match.triple.o.toString();
+            result[match.triple.s.toString()] = match.triple.o.toString();
         });
 
         findShapesResult(result);
