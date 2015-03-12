@@ -1,5 +1,5 @@
 var ShEx = require("../index.js");
-
+var assert = require("assert");
 
 var goodSchema = "PREFIX foaf: <http://xmlns.com/foaf/>\
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\
@@ -31,6 +31,10 @@ function testValidate(done, schema, data, expectedCallback, startingNodes) {
         dataParseError: function (errorMessage) {
         },
         validationResult: function (validation) {
+            assert(validation.passed);
+            done();
+
+
         },
         findTypesResult: function (typesResult){
         }
@@ -40,12 +44,7 @@ function testValidate(done, schema, data, expectedCallback, startingNodes) {
         startingNodes: startingNodes
     };
 
-    spyOn(callbacks, expectedCallback);
-
     var validator = new ShEx.Validator(schema, data, callbacks, options);
 
-    validator.validate(startingNodes).then(function (r) {
-        expect(callbacks[expectedCallback]).toHaveBeenCalled();
-        done();
-    }, done);
+    validator.validate(startingNodes).done();
 }
