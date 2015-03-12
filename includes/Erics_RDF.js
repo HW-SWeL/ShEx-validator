@@ -3598,7 +3598,9 @@ RDF = {
                         var p2 = schema.validate(s, ruleLabel, db, nestedValidatorStuff, false);
                         p2.then(function (res) {
                             // If it passed or is indeterminate,
-                            if (res.status !== RDF.DISPOSITION.FAIL) {
+                            //HERE BE THE HACK
+                            if (res.errors.length === 0) {
+                            //END HACK
 
                                 // record the success.
                                 RDF.message(s.toString() + " is a " + ruleLabel.toString());
