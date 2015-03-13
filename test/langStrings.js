@@ -5,7 +5,6 @@ var schema = "\
 PREFIX foaf: <http://xmlns.com/foaf/>\
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
 \
-start = <PersonShape>\
 <PersonShape> {\
     foaf:name rdf:langString\
 }\
@@ -26,8 +25,6 @@ describe("Test langString functionality", function () {
         };
         ShExWrapper.validate(schema, data, "validationResult", validationResult, {Somebody: "<PersonShape>"});
     });
-
-
 });
 
 

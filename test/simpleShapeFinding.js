@@ -4,7 +4,6 @@ var assert = require("assert");
 var goodSchema = "PREFIX foaf: <http://xmlns.com/foaf/>\
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\
 \
-    start = <PersonShape>\
 <PersonShape> {\
     foaf:name xsd:string\
 }";
@@ -12,7 +11,6 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\
 var badSchema = "PREFIX foaf: <http://xmlns.com/foaf/>\
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\
 \
-    start = <PersonShape>\
     \
 <PersonShape> {\
     foaf:ERROR xsd:string\
