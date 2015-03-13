@@ -1,4 +1,4 @@
-var RDF = require('./includes/Erics_RDF.js');
+var RDF = require('../includes/Erics_RDF.js');
 
 function formatError(fail) {
     var rule;

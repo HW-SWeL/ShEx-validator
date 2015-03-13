@@ -1,4 +1,4 @@
-var RDF = require('./includes/Erics_RDF.js');
+var RDF = require('../includes/Erics_RDF.js');
 
 function findShapes(schema, schemaResolver, db, closedShapes, findShapesResult) {
     schema.alwaysInvoke = {};

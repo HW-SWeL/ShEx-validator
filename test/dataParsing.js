@@ -1,5 +1,5 @@
 var RDF = require("../includes/Erics_RDF.js");
-var dataParser = require("../dataParser.js");
+var dataParser = require("../src/dataParser.js");
 var assert = require("assert");
 
 describe("parseNode", function () { 

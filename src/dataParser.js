@@ -1,6 +1,6 @@
 var Promise = require('promise');
 
-var RDF = require('./includes/Erics_RDF.js');
+var RDF = require('../includes/Erics_RDF.js');
 var N3 = require('n3');
 var N3Util = N3.Util;
 

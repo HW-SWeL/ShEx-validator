@@ -1,4 +1,4 @@
-var ShEx = require("../index.js");
+var ShEx = require("../src/index.js");
 
 function validate(schema, data, callbackName, callback, startingNodes) {
     run(schema, data, callbackName, callback, startingNodes, "validate");
