@@ -66,7 +66,7 @@ function processCommandLine(argv) {
     var alen = argv._.length;
 
     if (
-        argv.help ||
+        argv.h ||
         alen < 2 ||
         (alen < 3 && !(argv.f || argv.F)) ||
         (alen > 2 && (argv.f || argv.F))
@@ -98,6 +98,7 @@ function processCommandLine(argv) {
                 validator.validate(shapes).done();
             else {
                 for (var resource in shapes) {
+                    if (!shapes.hasOwnProperty(resource)) continue;
                     if (shapes[resource])
                         out(resource + " Is a " + shapes[resource]);
                     else
@@ -111,9 +112,11 @@ function processCommandLine(argv) {
                 out("Validation Passed: " + validation.matches.length + " matches");
             else {
                 error("Validation Failed :");
-                for (var e in validation.errors) {
-                    error(validation.errors[e].name + " : " + validation.errors[e].triple)
-                }
+
+                validation.errors.forEach(function(e) {
+                    error(e.name + " : " + e.triple);
+                })
+
             }
         }
     };
