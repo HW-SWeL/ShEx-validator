@@ -6,10 +6,10 @@ function formatError(fail) {
     //    rule = RDF.Triple(fail.rule.label, fail.rule.nameClass.term, fail.rule.valueClass.values[0].term);
     //else
     //    rule = RDF.Triple(fail.rule.label, fail.rule.nameClass.term, fail.rule.valueClass.type);
-
     return {
         name: fail._,
-        triple : fail
+        triple : fail,
+        req_lev: fail.rule.req_lev
     };
 }
 
