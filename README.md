@@ -4,6 +4,8 @@ Parses and a ShEx schema and RDF data file and validates the resources in the da
 
 A standalone Node module with a command line interface and validate() function as described below
 
+It is built on [Eric Prud'hommeaux's](http://www.w3.org/People/Eric/) [ShEx validator and parser](https://github.com/ericprud/ShExDemo)
+
 ## Installation
 
 ```sh
