@@ -103,6 +103,23 @@ Currently only n3.js is used for parsing the data but others can easily be added
 
 Validation is still performed by a combination of Erics PEG generated `includes/shexParser` and `includes/RDF.js`.
 
+### Requirement Levels ShEx Addition
+
+Requirement levels have been added to the ShEx syntax to a allow sematics such as "should" and "should not".
+The following example shows the syntax.
+
+```
+PREFIX foaf: <http://xmlns.com/foaf/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema>
+
+start = <PersonShape>
+<PersonShape> {
+    `should` foaf:name rdf:langString,
+    `should not` !foaf:age rdfs:Literal
+}
+```
+
 ### Tests
 Tests are done using Jasmine, and the test specifications are located in specs/.
 
