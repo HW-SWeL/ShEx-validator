@@ -27,15 +27,3 @@ describe("Requirement levels tests", function () {
         ShExWrapper.validate(goodSchema, goodData, "validationResult", validationResult, {Somebody: "<PersonShape>"});
     });
 });
-
-
-
-/*describe("Parse requirement level", function () {
-    it("should parse schema", function () {
-        return schemaParser.parseSchema(schema).then(function(data)) { 
-            expect(data.)
-            
-        });
-    });
-});*/
-
