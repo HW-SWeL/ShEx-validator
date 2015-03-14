@@ -68,7 +68,8 @@ validationResult = {
     ]},
     errors: [{
         name: string,
-        triple: RDF.Triple
+        triple: RDF.Triple,
+        req_lev: string
     ]}
 }
 
