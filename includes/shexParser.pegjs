@@ -149,6 +149,10 @@ _id = '$' _ i:iri _ { curSubject.push(i); return i; }
 
 label           = iri / BlankNode
 
+REQ_LEVEL_CHARS_BASE = [A-Z] / [a-z] / " "
+REQ_LEVEL_CHARS = l:REQ_LEVEL_CHARS_BASE r:REQ_LEVEL_CHARS? { return r ? l+r : l; }
+REQ_LEVEL = '`' req_t:REQ_LEVEL_CHARS '` ' { return req_t }
+
 arc             = CONCOMITANT _ '@' _ l:label _ r:repeatCount? _ p:properties? _ c:CodeMap {
     var v = new RDF.ValueReference(l, RDF.Position5(text(), line(), column(), offset(), l._pos.offset-offset()+l._pos.width));
     var width = v._pos.offset-offset()+v._pos.width;
@@ -160,7 +164,7 @@ arc             = CONCOMITANT _ '@' _ l:label _ r:repeatCount? _ p:properties? _
     if (p) ret.setRuleID(p);
     return ret;
 }
-                / bang:('!' _ )? inverse:('^' _ )? addative:('+' _ )? n:nameClass _ v:valueClass _ d:defahlt? _ r:repeatCount? _ p:properties? _ c:CodeMap {
+                / req:REQ_LEVEL? _ bang:('!' _ )? inverse:('^' _ )? addative:('+' _ )? n:nameClass _ v:valueClass _ d:defahlt? _ r:repeatCount? _ p:properties? _ c:CodeMap {
     if (d)
         throw peg$buildException('default (='+d.toString()+') not currently supported', null, peg$reportedPos);
     var width = v._pos.offset-offset()+v._pos.width;
@@ -168,7 +172,7 @@ arc             = CONCOMITANT _ '@' _ l:label _ r:repeatCount? _ p:properties? _
         width = r.ends-offset();
     else
         r = {min: 1, max: 1};
-    var ret = new RDF.AtomicRule(bang?true:false, inverse?true:false, addative?true:false, n, v, r.min, r.max, c, RDF.Position5(text(), line(), column(), offset(), width));
+    var ret = new RDF.AtomicRule(bang?true:false, inverse?true:false, addative?true:false, n, v, r.min, r.max, c, RDF.Position5(text(), line(), column(), offset(), width), req);
     if (p) ret.setRuleID(p);
     return ret;
 }

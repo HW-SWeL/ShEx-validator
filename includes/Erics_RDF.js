@@ -1632,8 +1632,8 @@ RDF = {
             };
     },
 
-    AtomicRule: function (negated, reversed, additive, nameClass, valueClass, min, max, codes, _pos) {
-        this._ = 'AtomicRule'; this.negated = negated; this.reversed = reversed; this.additive = additive; this.nameClass = nameClass; this.valueClass = valueClass; this.min = min; this.max = max; this.codes = codes; this._pos = _pos;
+    AtomicRule: function (negated, reversed, additive, nameClass, valueClass, min, max, codes, _pos, _req_lev) {
+        this._ = 'AtomicRule'; this.negated = negated; this.reversed = reversed; this.additive = additive; this.nameClass = nameClass; this.valueClass = valueClass; this.min = min; this.max = max; this.codes = codes; this._pos = _pos; this.req_lev = _req_lev;
         this.ruleID = undefined;
         this.setRuleID = function (ruleID) { this.ruleID = ruleID; };
         this.label = undefined;
