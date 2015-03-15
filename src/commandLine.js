@@ -112,21 +112,10 @@ function processCommandLine(argv) {
                 out("Validation Passed: " + validation.matches.length + " matches");
             else {
                 error("Validation Failed :");
-                var errors = {};
+                error("Errors in "+ validation.startingResource+":");
                 validation.errors.forEach(function(e) {
-                    if (errors[e.startingResource.toString()] === undefined) {
-                        errors[e.startingResource.toString()] = [];
-                    }
-                    errors[e.startingResource.toString()].push(e);
+                    error(e.toString());
                 });
-                for (var key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        errors[key].forEach(function(e){
-                            error("Errors in "+ key+":");
-                            error(e.toString());
-                        });
-                    }
-                }
             }
         }
     };

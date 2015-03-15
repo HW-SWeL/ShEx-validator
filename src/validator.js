@@ -40,7 +40,7 @@ function validate(schema,
 function cleanupValidation(valRes, resolver, startingResource, cb) {
 
     return valRes.then(function(valRes) {
-        var errors = valRes.errors.map(errorFormatter.bind(null,startingResource));
+        var errors = valRes.errors.map(errorFormatter);
 
         cb( {
             errors: errors,
