@@ -32,7 +32,7 @@ var callbacks = {
     dataParsed: function (data) {...},
     dataParseError: function (errorMessage) {...},
     validationResult: function (validationResult) {...},
-    shapeFindingResult: function(shapes) {...}
+    findShapesResult: function(shapes) {...}
 };
 
 var options = {
