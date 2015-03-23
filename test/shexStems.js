@@ -1,12 +1,21 @@
 var ShExWrapper = require("./ShExWrapper.js");
 var assert = require("assert");
 
-var schema = "\
+var schemaNameStem = "\
 PREFIX foaf: <http://xmlns.com/foaf/>\
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
 \
 <PersonShape> {\
     foaf:~ rdf:langString\
+}\
+";
+
+var schemaValueStem = "\
+PREFIX foaf: <http://xmlns.com/foaf/>\
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+\
+<PersonShape> {\
+    foaf:name rdf:~\
 }\
 ";
 
@@ -23,10 +32,16 @@ describe("Shex stem functionality", function () {
             assert(res.passed);
             done();
         };
-        ShExWrapper.validate(schema, data, "validationResult", validationResult, {Somebody: "<PersonShape>"});
+        ShExWrapper.validate(schemaNameStem, data, "validationResult", validationResult, {Somebody: "<PersonShape>"});
     });
 
-
+    it.skip("Should allow value stem", function (done) {
+        var validationResult = function (res) {
+            assert(res.passed);
+            done();
+        };
+        ShExWrapper.validate(schemaValueStem, data, "validationResult", validationResult, {Somebody: "<PersonShape>"});
+    });
 });
 
 
