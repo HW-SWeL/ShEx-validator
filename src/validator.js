@@ -20,14 +20,13 @@ function validate(schema,
 
         var startingNode = dataParser.parseNode(startingResource, dbResolver.Prefixes);
 
+        var instSh = RDF.IRI("http://open-services.net/ns/core#instanceShape");
+
         var validation = schema.validate(
             startingNode,
             startingResources[startingResource],
             db,
-            {
-                iriResolver: schemaResolver,
-                closedShapes: closedShapes
-            },
+            RDF.ValidatorStuff(schemaResolver, closedShapes, true).push(startingNode, instSh),
             true
         );
 
@@ -42,7 +41,7 @@ function cleanupValidation(valRes, resolver, startingResource, cb) {
     return valRes.then(function(valRes) {
         var errors = valRes.errors.map(errorFormatter);
 
-        cb( {
+        cb({
             errors: errors,
             matches: valRes.matches,
             startingResource: startingResource,

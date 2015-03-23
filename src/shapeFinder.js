@@ -8,7 +8,7 @@ function findShapes(schema, schemaResolver, db, closedShapes, findShapesResult) 
     var shapes = schema.findTypes(
         db,
         db.uniqueSubjects(),
-        []
+        RDF.ValidatorStuff(schemaResolver, closedShapes, true)
     );
 
     return cleanShapes(shapes, db, findShapesResult);
