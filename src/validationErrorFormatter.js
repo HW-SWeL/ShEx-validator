@@ -42,7 +42,27 @@ function formatError(fail) {
                 return "RuleFailMixedOpt - if you get this message contact someone";
             }
             else if (fail._ === "RuleFailOr") {
-                return "RuleFailOr - if you get this message contact someone";
+                if (fail.failures && fail.rule.disjoints) {
+                    //if the number of values is the same as the number of disjoints
+                    //then we can (maybe) guess that all the options are missing
+                    if (fail.failures.length === fail.rule.disjoints.length) {
+                        var retString = "Needs at least one of : ";
+                        fail.failures.forEach(function(f){
+                            //making some strong assumptions here
+                            retString += "\t Property " + f.errors[0].rule._pos._orig;
+                        });
+                        return retString;
+                    }
+                    //when there are less failures than disjoints, that means that
+                    //there are failures-disjoints violations of the or rule (maybe)
+                    else if (fail.failures.length < fail.rule.disjoints.length) {
+                        
+                    }
+                }
+
+                else {
+                    return "RuleFailOr - if you get this message contact someone";
+                }
             }
             else if (fail._ === "RuleFailTree") {
                 return "RuleFailTree - if you get this message contact someone";
