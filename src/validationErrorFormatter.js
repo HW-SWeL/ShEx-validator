@@ -74,6 +74,9 @@ function errorToString(fail) {
     else if (fail._ === "RuleFailValue") {
         return "RuleFailValue - if you get this message contact someone";
     }
+    else if (fail._ === "RuleFailExtra") {
+        return "RuleFailExtra - if you get this message contact someone";
+    }
     else if (fail._ === "RuleFail") {
         // Maybe replace this with the non expanded types - it's unclear
         // which would be better

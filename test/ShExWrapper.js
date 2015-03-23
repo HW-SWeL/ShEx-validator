@@ -1,14 +1,14 @@
 var ShEx = require("../src/index.js");
 
-function validate(schema, data, callbackName, callback, startingNodes) {
-    run(schema, data, callbackName, callback, startingNodes, "validate");
+function validate(schema, data, callbackName, callback, startingNodes, closedShapes) {
+    run(schema, data, callbackName, callback, startingNodes, "validate", closedShapes);
 }
 
-function findShapes(schema, data, callbackName, callback) {
-    run(schema, data, callbackName, callback, null, "findShapes");
+function findShapes(schema, data, callbackName, callback, closedShapes) {
+    run(schema, data, callbackName, callback, null, "findShapes", closedShapes);
 }
 
-function run(schema, data, callbackName, callback, startingNodes, mode) {
+function run(schema, data, callbackName, callback, startingNodes, mode, closedShapes) {
     var callbacks = {
         schemaParsed: function (schema) {
 
@@ -28,7 +28,8 @@ function run(schema, data, callbackName, callback, startingNodes, mode) {
     callbacks[callbackName] = callback;
 
     var options = {
-        startingNodes: startingNodes
+        startingNodes: startingNodes,
+        closedShapes: closedShapes?true:closedShapes
     };
 
     var validator = new ShEx.Validator(schema, data, callbacks, options);
