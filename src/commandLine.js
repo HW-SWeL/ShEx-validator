@@ -112,11 +112,10 @@ function processCommandLine(argv) {
                 out("Validation Passed: " + validation.matches.length + " matches");
             else {
                 error("Validation Failed :");
-
+                error("Errors in "+ validation.startingResource+":");
                 validation.errors.forEach(function(e) {
-                    error(e.name + " : " + e.triple);
-                })
-
+                    error(e.description);
+                });
             }
         }
     };
