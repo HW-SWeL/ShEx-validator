@@ -114,7 +114,7 @@ function processCommandLine(argv) {
                 error("Validation Failed :");
                 error("Errors in "+ validation.startingResource+":");
                 validation.errors.forEach(function(e) {
-                    error(e.toString());
+                    error(e.description);
                 });
             }
         }
