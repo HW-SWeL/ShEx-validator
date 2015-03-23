@@ -77,7 +77,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     ###dcat:accessURL IRI, ### is a MAY property
     !dcat:downloadURL .,
     !void:dataDump .,
-    (void:sparqlEndpoint IRI)?,
+    void:sparqlEndpoint IRI?,
 #Statistics
     !void:triples .,
     !void:entities .,
@@ -97,7 +97,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     dct:title rdf:langString,
     ###dct:alternative rdf:langString, is a MAY property
     dct:description rdf:langString,
-    (dct:creator IRI | pav:createdBy IRI)+,
+    (dct:creator IRI, pav:createdBy IRI)+,
     ###(dct:contributor IRI)*, ###MAY property
     ###(pav:authoredBy IRI)*, ###MAY property
     ###(pav:curatedBy IRI)*, ###MAY property
@@ -140,7 +140,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     (dct:source IRI)*,
     (pav:retrievedFrom IRI)?,
     (prov:wasDerivedFrom IRI)*,
-    (pav:createdWith IRI)?,
+    pav:createdWith IRI?,
     !dct:accrualPeriodicity . ,
 #Availability/Distributions
     (dcat:distribution IRI)*, ###TODO restrict the shape of the IRI but could be hard to test in practice
@@ -170,7 +170,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     dct:title rdf:langString,
     ###dct:alternative rdf:langString, is a MAY property
     dct:description rdf:langString,
-    (dct:creator IRI | pav:createdBy IRI)+,
+    (dct:creator IRI, pav:createdBy IRI)+,
     ###(dct:contributor IRI)*,
     ###(pav:authoredBy IRI)*,
     ###(pav:curatedBy IRI)*, MAY property
