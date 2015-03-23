@@ -18,7 +18,7 @@ PREFIX foaf: <http://xmlns.com/foaf/> \
 
 
 describe("Shex stem functionality", function () {
-    it.skip("Should allow multiple languages", function (done) {
+    it("Should allow name stem", function (done) {
         var validationResult = function (res) {
             assert(res.passed);
             done();

@@ -1197,7 +1197,7 @@ RDF = {
         };
     },
     NamePattern: function (term, exclusions) {
-        this._ = 'NamePattern'; this.term = term; this.exclusions = exclusions; this._pos = _pos;
+        this._ = 'NamePattern'; this.term = term; this.exclusions = exclusions;
         this.toString = function (orig) {
             return this.term.toString(orig) + '~' + this.exclusions.map(function (ex) { return ' - ' + ex.toString(orig); }).join('');
         };
