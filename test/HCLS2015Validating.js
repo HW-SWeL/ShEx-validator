@@ -30,4 +30,3 @@ describe("HCLS 2015 Tests", function () {
     });
 });
 
-
