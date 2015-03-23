@@ -21,7 +21,7 @@ describe("HCLS 2015 Tests", function () {
         ShExWrapper.validate(inputs.schema, inputs.data, "validationResult", validationResult, {"http://rdf.ebi.ac.uk/chembl/chembl": "<SummaryLevelShape>"});
     });
 
-    it.skip("should validate chembl17 as VersionLevelShape", function (done) {
+    it("should validate chembl17 as VersionLevelShape", function (done) {
         var validationResult = function (res) {
             assert(res.passed);
             done();

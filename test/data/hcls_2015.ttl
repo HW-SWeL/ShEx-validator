@@ -95,7 +95,7 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
     idot:preferredPrefix "chembl" ;
     idot:alternatePrefix "chembldb" ;
 #Provenance and Change
-    pav:version "17"^^xsd:string, "17.0" ;
+    pav:version "17.0" ;
     dct:isVersionOf :chembl ;
     pav:previousVersion :chembl16 ;
     dct:source :pubchem-bioassay-09-01-2014 ;
