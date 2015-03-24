@@ -1875,6 +1875,10 @@ RDF = {
                     }
                     return ret;
                 }
+
+                if(_AtomicRule.req_lev in ["may", "should", "should not"])
+                    ret.status = RDF.DISPOSITION.PASS;
+
                 if (validatorStuff.async) {
                     return pet.then(function () {
                         return handleNegation(ret);
