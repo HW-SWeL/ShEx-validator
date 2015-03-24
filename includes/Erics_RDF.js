@@ -1876,7 +1876,7 @@ RDF = {
                     return ret;
                 }
 
-                if(_AtomicRule.req_lev in ["may", "should", "should not",])
+                if(_AtomicRule.req_lev in ["may", "should", "should not"])
                     ret.status = RDF.DISPOSITION.PASS;
 
                 if (validatorStuff.async) {
