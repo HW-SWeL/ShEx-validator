@@ -21,8 +21,9 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
 
 var data = '\
 PREFIX foaf: <http://xmlns.com/foaf/> \
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
 <Somebody>\
-    foaf:name "Mr Smith"@en.\
+    foaf:name "Mr Smith"^^rdf:langString.\
 ';
 
 
@@ -35,8 +36,9 @@ describe("Shex stem functionality", function () {
         ShExWrapper.validate(schemaNameStem, data, "validationResult", validationResult, {Somebody: "<PersonShape>"});
     });
 
-    it.skip("Should allow value stem", function (done) {
+    it("Should allow value stem", function (done) {
         var validationResult = function (res) {
+            console.log(res);
             assert(res.passed);
             done();
         };
