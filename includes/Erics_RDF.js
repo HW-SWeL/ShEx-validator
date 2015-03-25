@@ -1875,16 +1875,24 @@ RDF = {
                     }
                     return ret;
                 }
-
-                if(_AtomicRule.req_lev in ["may", "should", "should not"])
-                    ret.status = RDF.DISPOSITION.PASS;
+                
 
                 if (validatorStuff.async) {
                     return pet.then(function () {
-                        return handleNegation(ret);
+                        ret = handleNegation(ret);
+                        if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
+                            ret.status = RDF.DISPOSITION.PASS;
+                        }
+                        return ret;
                     });
-                } else
-                    return handleNegation(ret);
+                } else {
+                    ret = handleNegation(ret);
+                    if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
+                        ret.status = RDF.DISPOSITION.PASS;
+                    }
+                    return ret;
+                }
+
             }
         };
         this.SPARQLvalidation = function (schema, label, prefixes, depth, counters, inOpt) {
