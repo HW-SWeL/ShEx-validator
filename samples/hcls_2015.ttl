@@ -19,12 +19,13 @@ PREFIX schemaorg: <http://schema.org/>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX void: <http://rdfs.org/ns/void/>
+PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX void-ext: <http://ldf.fi/void-ext#>
 
 ###Summary Level (Complete)
 :chembl
     rdf:type dctypes:Dataset;
+
     dct:title "ChEMBL"@en ;
     dct:alternative "ChEMBLdb"@en ;
     dct:description "ChEMBL is a database of bioactive compounds, their quantitative properties and bioactivities (binding constants, pharmacology and ADMET, etc). The data is abstracted and curated from the primary scientific literature."@en ;

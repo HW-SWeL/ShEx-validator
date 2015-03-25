@@ -42,13 +42,13 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST NOT` !dct:created .,
 
     #Other dates
-    `MUST NOT` !pav:createdOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MUST NOT` !pav:createdOn xsd:gYearMonth,
 
     #Other dates
-    `MUST NOT` !pav:authoredOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MUST NOT` !pav:authoredOn xsd:gYearMonth,
 
     #Other dates
-    `MUST NOT` !pav:curatedOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MUST NOT` !pav:curatedOn xsd:gYearMonth,
 
     #Creators
     `MUST NOT` !dct:creator IRI+,
@@ -171,7 +171,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   #Availability/Distributions
 
     #Distribution description
-    `MUST NOT` !dcat:distribution IRI,
+    `MUST NOT` !dcat:distribution IRI+,
 
     #File format
     `MUST NOT` !dct:format .,
@@ -267,13 +267,13 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `SHOULD` dct:created .,
 
     #Other dates
-    `MAY` pav:createdOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:createdOn xsd:gYearMonth,
 
     #Other dates
-    `MAY` pav:authoredOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:authoredOn xsd:gYearMonth,
 
     #Other dates
-    `MAY` pav:curatedOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:curatedOn xsd:gYearMonth,
 
     #Creators
     `MUST` dct:creator IRI+,
@@ -396,7 +396,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   #Availability/Distributions
 
     #Distribution description
-    `SHOULD` dcat:distribution IRI,
+    `SHOULD` dcat:distribution IRI+,
 
     #File format
     `MUST NOT` !dct:format .,
@@ -492,13 +492,13 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `SHOULD` dct:created .,
 
     #Other dates
-    `MAY` pav:createdOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:createdOn xsd:gYearMonth,
 
     #Other dates
-    `MAY` pav:authoredOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:authoredOn xsd:gYearMonth,
 
     #Other dates
-    `MAY` pav:curatedOn (xsd:dateTime xsd:date xsd:gYearMonth xsd:gYear),
+    `MAY` pav:curatedOn xsd:gYearMonth,
 
     #Creators
     `MUST` dct:creator IRI+,
@@ -621,7 +621,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   #Availability/Distributions
 
     #Distribution description
-    `MUST NOT` !dcat:distribution IRI,
+    `MUST NOT` !dcat:distribution IRI+,
 
     #File format
     `MUST` dct:format .,
