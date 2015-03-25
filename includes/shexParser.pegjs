@@ -191,6 +191,7 @@ valueClass      = '@' _ l:label { return new RDF.ValueReference(l, RDF.Position5
     curSchema.add(b, r);
     return new RDF.ValueReference(b, RDF.Position5(text(), line(), column(), offset(), 1)); // Only hilight open brace.
 }
+                / s:_objSingleIriStem { return s; }
                 / t:nodeType { return new RDF.ValueType(t, RDF.Position5(text(), line(), column(), offset(), t._pos.width)); }
                 / n:iri { return new RDF.ValueType(n, RDF.Position5(text(), line(), column(), offset(), n._pos.width)); }
                 / s:valueSet { return new RDF.ValueSet(s.list, RDF.Position5(text(), line(), column(), offset(), s.ends-offset())); }
@@ -294,6 +295,10 @@ CodeMap         = codeList:_codePair* {
     return ret;
 }
 _codePair = c:CODE _ { return c; }
+
+_objSingleIriStem = i:iri patFlag:( _ TILDE _ exclusions) {
+    return new RDF.ValuePattern(i, patFlag[3] ? patFlag[3].list : [], RDF.Position5(text(), line(), column(), offset(), patFlag[1]-offset()));
+}
 
 _objIriStem      = i:iri patFlag:( _ TILDE _ exclusions)? {
     return patFlag
