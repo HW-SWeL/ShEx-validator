@@ -126,7 +126,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST NOT` !void:uriRegexPattern xsd:string,
 
     #File access pattern
-    `MUST NOT` !idot:accessPattern idot:AccessPattern,
+    `MUST NOT` !idot:accessPattern .+,
 
     #Example identifier
     `MUST NOT` !idot:exampleIdentifier xsd:string,
@@ -351,7 +351,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST NOT` !void:uriRegexPattern xsd:string,
 
     #File access pattern
-    `MUST NOT` !idot:accessPattern idot:AccessPattern,
+    `MUST NOT` !idot:accessPattern .+,
 
     #Example identifier
     `MUST NOT` !idot:exampleIdentifier xsd:string,
@@ -576,7 +576,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MAY` void:uriRegexPattern xsd:string,
 
     #File access pattern
-    `MAY` idot:accessPattern idot:AccessPattern,
+    `MAY` idot:accessPattern .+,
 
     #Example identifier
     `SHOULD` idot:exampleIdentifier xsd:string,
