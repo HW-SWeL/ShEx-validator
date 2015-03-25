@@ -38,7 +38,6 @@ describe("Shex stem functionality", function () {
 
     it("Should allow value stem", function (done) {
         var validationResult = function (res) {
-            console.log(res);
             assert(res.passed);
             done();
         };

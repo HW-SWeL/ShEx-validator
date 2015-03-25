@@ -297,9 +297,7 @@ CodeMap         = codeList:_codePair* {
 _codePair = c:CODE _ { return c; }
 
 _objSingleIriStem = i:iri patFlag:( _ TILDE _ exclusions) {
-    return patFlag
-        ? new RDF.ValuePattern(i, patFlag[3] ? patFlag[3].list : [], RDF.Position5(text(), line(), column(), offset(), patFlag[1]-offset()))
-        : new RDF.ValueTerm(i, RDF.Position5(text(), line(), column(), offset(), i._pos.width));
+    return new RDF.ValuePattern(i, patFlag[3] ? patFlag[3].list : [], RDF.Position5(text(), line(), column(), offset(), patFlag[1]-offset()));
 }
 
 _objIriStem      = i:iri patFlag:( _ TILDE _ exclusions)? {
