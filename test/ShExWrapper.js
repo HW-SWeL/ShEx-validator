@@ -29,7 +29,7 @@ function run(schema, data, callbackName, callback, startingNodes, mode, closedSh
 
     var options = {
         startingNodes: startingNodes,
-        closedShapes: closedShapes?true:closedShapes
+        closedShapes: closedShapes !== undefined?closedShapes:true
     };
 
     var validator = new ShEx.Validator(schema, data, callbacks, options);
