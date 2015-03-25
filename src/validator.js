@@ -14,9 +14,11 @@ function validate(schema,
 
     schema.alwaysInvoke = {};
 
+    var validationPromises = [];
+
     for (var startingResource in startingResources) {
 
-        if(!startingResources[startingResource]) break;
+        if(!startingResources.hasOwnProperty(startingResource) || !startingResources[startingResource]) continue;
 
         var startingNode = dataParser.parseNode(startingResource, dbResolver.Prefixes);
 
@@ -30,10 +32,11 @@ function validate(schema,
             true
         );
 
-        return cleanupValidation(validation, dbResolver, startingNode, validationResult);
-
+        validationPromises.push(cleanupValidation(validation, dbResolver, startingNode, validationResult));
 
     }
+
+    return Promise.all(validationPromises);
 }
 
 function cleanupValidation(valRes, resolver, startingResource, cb) {
