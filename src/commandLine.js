@@ -47,6 +47,9 @@ function processCommandLine(argv) {
 
     argv = parseArgs(argv.slice(2), {
         boolean: ["closed-shape", "absolute-iri", "find-shapes", "find-and-use-shapes"],
+        default: {
+            "closed-shape": true
+        },
         alias: {
             c: "closed-shape",
             h: "help",
@@ -108,15 +111,14 @@ function processCommandLine(argv) {
 
         },
         validationResult: function (validation) {
-            if (validation.passed)
-                out("Validation Passed: " + validation.matches.length + " matches");
-            else {
-                error("Validation Failed :");
-                error("Errors in "+ validation.startingResource+":");
-                validation.errors.forEach(function(e) {
-                    error(e.description);
+            out("Validated: " + validation.matches.length + " matches");
+            if (validation.errors.length > 0) {
+                error("Errors/Warnings in " + validation.startingResource + ":");
+                validation.errors.forEach(function (e) {
+                    error((e.req_lev? e.req_lev + ": ":"") + e.description);
                 });
             }
+
         }
     };
 

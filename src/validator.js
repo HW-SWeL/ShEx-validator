@@ -1,6 +1,7 @@
 var RDF = require('../includes/Erics_RDF.js');
 var dataParser = require("./dataParser.js");
 var errorFormatter = require("./validationErrorFormatter.js");
+var Promise = require("promise");
 
 
 function validate(schema,
@@ -14,9 +15,11 @@ function validate(schema,
 
     schema.alwaysInvoke = {};
 
+    var validationPromises = [];
+
     for (var startingResource in startingResources) {
 
-        if(!startingResources[startingResource]) break;
+        if(!startingResources.hasOwnProperty(startingResource) || !startingResources[startingResource]) continue;
 
         var startingNode = dataParser.parseNode(startingResource, dbResolver.Prefixes);
 
@@ -30,10 +33,11 @@ function validate(schema,
             true
         );
 
-        return cleanupValidation(validation, dbResolver, startingNode, validationResult);
-
+        validationPromises.push(cleanupValidation(validation, dbResolver, startingNode, validationResult));
 
     }
+
+    return Promise.all(validationPromises);
 }
 
 function cleanupValidation(valRes, resolver, startingResource, cb) {
