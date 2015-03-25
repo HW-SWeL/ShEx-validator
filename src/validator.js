@@ -1,6 +1,7 @@
 var RDF = require('../includes/Erics_RDF.js');
 var dataParser = require("./dataParser.js");
 var errorFormatter = require("./validationErrorFormatter.js");
+var Promise = require("promise");
 
 
 function validate(schema,
