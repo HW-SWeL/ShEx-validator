@@ -115,7 +115,7 @@ function processCommandLine(argv) {
             if (validation.errors.length > 0) {
                 error("Errors/Warnings in " + validation.startingResource + ":");
                 validation.errors.forEach(function (e) {
-                    error(e.req_lev? e.req_lev + ": ":"" + e.description);
+                    error((e.req_lev? e.req_lev + ": ":"") + e.description);
                 });
             }
 
