@@ -1672,7 +1672,8 @@ RDF = {
                         return validatorStuff.async ? Promise.resolve(ret1) : ret1;
                     }
                 }
-                if (point.lex.substr(0,this.term.lex.length) !== this.term.lex) {
+
+                if (point.datatype.lex.substr(0,this.term.lex.length) !== this.term.lex) {
                     var ret2 = new RDF.ValRes();
                     { ret2.status = RDF.DISPOSITION.FAIL; ret2.error_noMatch(rule, t); }
                     return validatorStuff.async ? Promise.resolve(ret2) : ret2;
