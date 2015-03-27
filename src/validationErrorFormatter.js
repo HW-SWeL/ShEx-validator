@@ -6,7 +6,8 @@ function formatError(fail) {
         name: fail._,
         triple : fail,
         req_lev: fail.rule.req_lev,
-        description: errorToString(fail) 
+        description: errorToString(fail),
+        line: getLine(fail)
     };
 }
 
@@ -83,6 +84,16 @@ function errorToString(fail) {
         return "Property " + fail.rule.nameClass.term._pos._orig
         + " has a value with type: " + fail.triple.o.datatype 
         + " instead of the expected type: " + fail.rule.valueClass.toString();
+    }
+}
+
+function getLine(fail) {
+    if(fail.triples && fail.triples[0]) {
+        return fail.triples[0].line
+    }
+
+    if(fail.triple) {
+        return fail.triple.line
     }
 }
 
