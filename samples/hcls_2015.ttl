@@ -19,7 +19,7 @@ PREFIX schemaorg: <http://schema.org/>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX void: <http://rdfs.org/ns/void/>
+PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX void-ext: <http://ldf.fi/void-ext#>
 
 ###Summary Level (Complete)
@@ -152,7 +152,7 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
     ###void:exampleResource does not make sense for a non-RDF resource
 #Provenance and Change
     ###sio:has-data-item-in not used for non-RDF resources
-    pav:version "17"^^xsd:string, "17.0" ;
+    pav:version "17.0" ;
     pav:previousVersion :chembl16db ;
     dct:source :pubchem-bioassay-09-01-2014 ;
     pav:retrievedFrom <http://example.com/madeUp/forExample> ;
@@ -214,7 +214,7 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
 #Provenance and Change
     #Only one data item given for the purpose of the example, all resources should be listed
     sio:has-data-item <http://rdf.ebi.ac.uk/resource/chembl/compound/CHEMBL25> ;
-    pav:version "17"^^xsd:string, "17.0" ;
+    pav:version "17.0" ;
     pav:previousVersion :chembl16rdf ;
     dct:source :pubchem-bioassay-09-01-2014 ;
     pav:retrievedFrom :pubchem-bioassay-09-01-2014 ;
@@ -375,7 +375,7 @@ If ChEMBL is incorporated into other works, we ask that the ChEMBL IDs are prese
 #Provenance and Change
     #Only one data item given for the purpose of the example, all resources should be listed
     sio:has-data-item <http://rdf.ebi.ac.uk/resource/chembl/targetcomponent/CHEMBL_TC_4803> ;
-    pav:version "17"^^xsd:string, "17.0" ;
+    pav:version "17.0" ;
     pav:previousVersion :chembl16-uniprot-exactMatch-linkset ;
     dct:source :pubchem-bioassay-09-01-2014 ;
     pav:retrievedFrom :pubchem-bioassay-09-01-2014 ;
