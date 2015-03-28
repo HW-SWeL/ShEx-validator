@@ -23,7 +23,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !rdf:type (void:Dataset),
     !rdf:type (dcat:Distribution),
     dct:title rdf:langString,
-    `may` dct:alternative rdf:langString,
+    ###dct:alternative rdf:langString, is a MAY property
     dct:description rdf:langString,
     !dct:creator .,
     !pav:createBy .,
@@ -36,26 +36,26 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !pav:curatedOn .,
     dct:publisher IRI,
     !dct:issued .,
-    foaf:page IRI?,
-    schemaorg:logo IRI?,
-    `may` dct:license IRI+,
-    `may` dct:rights rdf:langString,
+    (foaf:page IRI)?,
+    (schemaorg:logo IRI)?,
+    (dct:license IRI)* , ### License is now a MAY property
+    ###dct:rights rdf:langString, ### Rights is a MAY property
     !dct:language .,
-    `may` dcat:theme IRI*,
-    `may` dcat:keyword xsd:string+,
+    ###dcat:theme IRI*, ### Theme is a MAY property, should match something that is a skos:Concept
+    ###dcat:keyword xsd:string, ### Keyword is a MAY property
     !void:vocabulary .,
     !dct:conformsTo .,
-    `may` dct:references IRI,
-    `may` cito:citesAsAuthority IRI,
-    `may` rdfs:seeAlso IRI,
-    `may` dct:hasPart IRI+, ###part is a MAY property, what should be the shape of the description it matches?
+    ###dct:references IRI, ###MAY property
+    ###cito:citesAsAuthority IRI, ### citation is a MAY property
+    ###rdfs:seeAlso IRI, ###MAY property
+    ###dct:hasPart IRI, ###part is a MAY property, what should be the shape of the description it matches?
     !void:subset .,
 #Identifiers
-    `may` idot:preferredPrefix xsd:string,
-    `may` idot:alternatePrefix xsd:string,
+    ###idot:preferredPrefix xsd:string, ### Preferred prefix is a MAY property
+    ###idot:alternatePrefix xsd:string, ### Alternate prefix is a MAY property
     !idot:identifierPattern .,
     !void:uriRegexPattern .,
-    `may` !idot:accessPattern ., ### Access pattern is a MAY property
+    !idot:accessPattern ., ### Access pattern is a MAY property
     !idot:exampleIdentifier .,
     !void:exampleResource .,
 #Provenance and Change
@@ -64,17 +64,17 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !pav:version .,
     !dct:isVersionOf .,
     !pav:previousVersion .,
-    `may` pav:hasCurrentVersion IRI, ###  is a MAY property, should this match an @VersionShape?
+    ###pav:hasCurrentVersion IRI, ###  is a MAY property, should this match an @VersionShape?
     !dct:source .,
     !pav:retrievedFrom .,
     !prov:wasDerivedFrom .,
     !pav:createdWith .,
-    dct:accrualPeriodicity IRI?,###freq:~?, ###TODO see https://github.com/HeriotWattMEng2015/ShEx-validator/issues/21
+    dct:accrualPeriodicity IRI?,###freq:~?, ###TODO Check freq:~ is the correct syntax
 #Availability/Distributions
     !dcat:distribution .,
     !dcat:landingPage .,
     !dct:format .,
-    `may` dcat:accessURL IRI,
+    ###dcat:accessURL IRI, ### is a MAY property
     !dcat:downloadURL .,
     !void:dataDump .,
     void:sparqlEndpoint IRI?,
@@ -95,12 +95,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !rdf:type (void:Dataset),
     !rdf:type (dcat:Distribution),
     dct:title rdf:langString,
-    `may` dct:alternative rdf:langString,
+    ###dct:alternative rdf:langString, is a MAY property
     dct:description rdf:langString,
     (dct:creator IRI, pav:createdBy IRI)+,
-    `may` dct:contributor IRI*,
-    `may` pav:authoredBy IRI*,
-    `may` pav:curatedBy IRI*,
+    ###(dct:contributor IRI)*, ###MAY property
+    ###(pav:authoredBy IRI)*, ###MAY property
+    ###(pav:curatedBy IRI)*, ###MAY property
     ###TODO add test that one of created or issued is present
     (dct:created xsd:date | dct:created  xsd:dateTime | dct:created xsd:gYearMonth | dct:created xsd:gYear | pav:createdOn xsd:dateTime)?,
     ###(pav:createdOn xsd:date | pav:createdOn  xsd:dateTime | pav:createdOn xsd:gYearMonth | pav:createdOn xsd:gYear), ###MAY property
@@ -111,20 +111,20 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     (foaf:page IRI)?,
     (schemaorg:logo IRI)?,
     (dct:license IRI)+ , ### License is SHOULD property, but multiple allowed
-    `may` dct:rights rdf:langString,
+    ###dct:rights rdf:langString, ### Rights is a MAY property
     (dct:language .)*, ###TODO define the object
-    `may` dcat:theme IRI*, ### Theme is a MAY property, should match something that is a skos:Concept
-    `may` dcat:keyword xsd:string*, ### Keyword is a MAY property
+    ###dcat:theme IRI*, ### Theme is a MAY property, should match something that is a skos:Concept
+    ###dcat:keyword xsd:string, ### Keyword is a MAY property
     !void:vocabulary .,
-    `may` dct:conformsTo IRI, ###MAY property
-    `may` dct:references IRI, ###MAY property
-    `may` cito:citesAsAuthority IRI, ### citation is a MAY property
-    `may` rdfs:seeAlso IRI, ###MAY property
-    `may` dct:hasPart IRI*, ###part is a MAY property, what should be the shape of the description it matches?
+    ###dct:conformsTo IRI, ###MAY property
+    ###dct:references IRI, ###MAY property
+    ###cito:citesAsAuthority IRI, ### citation is a MAY property
+    ###rdfs:seeAlso IRI, ###MAY property
+    ###dct:hasPart IRI, ###part is a MAY property, what should be the shape of the description it matches?
     !void:subset .,
 #Identifiers
-    `may` idot:preferredPrefix xsd:string, ### Preferred prefix is a MAY property
-    `may` idot:alternatePrefix xsd:string, ### Alternate prefix is a MAY property
+    ###idot:preferredPrefix xsd:string, ### Preferred prefix is a MAY property
+    ###idot:alternatePrefix xsd:string, ### Alternate prefix is a MAY property
     !idot:identifierPattern .,
     !void:uriRegexPattern .,
     !idot:accessPattern .,
@@ -144,12 +144,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !dct:accrualPeriodicity . ,
 #Availability/Distributions
     (dcat:distribution IRI)*, ###TODO restrict the shape of the IRI but could be hard to test in practice
-    `may` dcat:landingPage IRI, ###MAY property
+    ###dcat:landingPage IRI, ###MAY property
     !dct:format .,
-    `may` dcat:accessURL IRI, ### is a MAY property
+    ###dcat:accessURL IRI, ### is a MAY property
     !dcat:downloadURL .,
     !void:dataDump .,
-    `should not` !void:sparqlEndpoint ., ###SHOULD NOT being strict here
+    !void:sparqlEndpoint ., ###SHOULD NOT being strict here
 #Statistics
     !void:triples .,
     !void:entities .,
@@ -168,12 +168,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !rdf:type (void:Dataset),
     rdf:type (dcat:Distribution),
     dct:title rdf:langString,
-    `may` dct:alternative rdf:langString,
+    ###dct:alternative rdf:langString, is a MAY property
     dct:description rdf:langString,
     (dct:creator IRI, pav:createdBy IRI)+,
     ###(dct:contributor IRI)*,
     ###(pav:authoredBy IRI)*,
-    `may` pav:curatedBy IRI*,
+    ###(pav:curatedBy IRI)*, MAY property
     ###TODO add test that one of created or issued is present
     (dct:created xsd:date | dct:created  xsd:dateTime | dct:created xsd:gYearMonth | dct:created xsd:gYear | pav:createdOn xsd:dateTime)?,
     ###pav:createdOn xsd:date | pav:createdOn  xsd:dateTime | pav:createdOn xsd:gYearMonth | pav:createdOn xsd:gYear, ###MAY property
@@ -184,23 +184,23 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     (foaf:page IRI)?,
     (schemaorg:logo IRI)?,
     (dct:license IRI)+ , ### License is MUST property, but multiple allowed
-    `may` dct:rights rdf:langString, ### Rights is a MAY property
+    ###dct:rights rdf:langString, ### Rights is a MAY property
     (dct:language .)*, ###TODO define the object
-    `may` dcat:theme IRI*, ### Theme is a MAY property, should match something that is a skos:Concept
-    `may` dcat:keyword xsd:string*, ### Keyword is a MAY property
+    ###dcat:theme IRI*, ### Theme is a MAY property, should match something that is a skos:Concept
+    ###dcat:keyword xsd:string*, ### Keyword is a MAY property
     !void:vocabulary .,
     (dct:conformsTo IRI)?,
-    `may` dct:references IRI, ###MAY property
-    `may` cito:citesAsAuthority IRI, ### citation is a MAY property
-    `may` rdfs:seeAlso IRI, ###MAY property
+    ###dct:references IRI, ###MAY property
+    ###cito:citesAsAuthority IRI, ### citation is a MAY property
+    ###rdfs:seeAlso IRI, ###MAY property
     !dct:hasPart .,
     !void:subset ., ### Not for a non-RDF dataset
 #Identifiers
-    `may` idot:preferredPrefix xsd:string, ### Preferred prefix is a MAY property
-    `may` idot:alternatePrefix xsd:string, ### Alternate prefix is a MAY property
-    `may` idot:identifierPattern xsd:string, ###MAY property
+    ###idot:preferredPrefix xsd:string, ### Preferred prefix is a MAY property
+    ###idot:alternatePrefix xsd:string, ### Alternate prefix is a MAY property
+    ###idot:identifierPattern xsd:string, ###MAY property
     !void:uriRegexPattern ., ### Not for an non-RDF dataset
-    `may` idot:accessPattern xsd:string*, ### Access pattern is a MAY property
+    ###idot:accessPattern idot:AccessPattern, ### Access pattern is a MAY property
     (idot:exampleIdentifier xsd:string)*,
     !void:exampleResource ., ### Not for an non-RDF dataset
 #Provenance and Change
@@ -217,9 +217,9 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     !dct:accrualPeriodicity . ,
 #Availability/Distributions
     !dcat:distribution .,
-    `may` dcat:landingPage IRI,###MAY property
+    ###dcat:landingPage IRI,###MAY property
     (dct:format IRI | dct:format xsd:string),
-    `may` dcat:accessURL IRI, ### is a MAY property
+    ###dcat:accessURL IRI, ### is a MAY property
     (dcat:downloadURL IRI)?,
     !void:dataDump .,  ### Not for a non-RDF dataset
     !void:sparqlEndpoint ., #Applying strict semantics here
