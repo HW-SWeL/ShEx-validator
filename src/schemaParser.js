@@ -8,7 +8,7 @@ exports.parseSchema = function parseSchema(schemaText) {
         var resolver = RDF.createIRIResolver();
         var schema;
         try {
-            schema = shexSchemaParser.parse(schemaText, {iriResolver: resolver});
+            schema = shexSchemaParser.parse(schemaText, {iriResolver: resolver, bnodeScope:RDF.createBNodeScope()});
         }
         catch (e) {
             reject(e);
