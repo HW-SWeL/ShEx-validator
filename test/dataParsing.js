@@ -27,9 +27,9 @@ describe("parseNode", function () {
 
 describe("parseNode", function () { 
     it("Should throw an error", function () {
-        function tester() {
-            dataParser.parseNode("");
-        }
-        assert.throws(tester);
+
+        var iri = dataParser.parseNode("");
+        assert.equal(iri._, "IRI");
+
     });
 });
