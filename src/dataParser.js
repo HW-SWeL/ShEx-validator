@@ -40,7 +40,7 @@ function parseWithN3(dataText) {
         var db = RDF.Dataset();
 
         parser.parse(dataText, function (error, N3triple, prefixes) {
-            if (error) reject(error);
+            if (error) reject(parseN3Error(error));
             else if (N3triple) {
                 var triple = RDF.Triple(
                     parseNode(N3triple.subject),
@@ -58,4 +58,16 @@ function parseWithN3(dataText) {
             }
         });
     });
+}
+
+function parseN3Error(error) {
+    var line = error.message.match(/line [0-9]*/g);
+
+    line = (line && line.length > 0 && line[0].length > 5)?Number(line[0].substr(5)):null;
+
+    return {
+        message: error.message,
+        line: line,
+        column: 0
+    }
 }
