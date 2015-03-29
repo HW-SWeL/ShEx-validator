@@ -3713,14 +3713,8 @@ RDF = {
 
                 // Make sure we used all of the closedSubGraph.
                 if (validatorStuff.closedShapes) {
-                    if (validatorStuff.async)
-                        resOrPromise = resOrPromise.then(checkRemaining).catch(function (e) {
-                            debugger;
-                            return Promise.reject(e);
-                        });
-                    else
-                        checkRemaining(resOrPromise);
-                    function checkRemaining (res) {
+                    
+                    window.checkRemaining = function checkRemaining (res) {
                         if (res.passed()) {
                             var remaining = closedSubGraph.filter(function (t) {
                                 var r = res.triples();
@@ -3734,6 +3728,14 @@ RDF = {
                         }
                         return res;
                     }
+                    
+                    if (validatorStuff.async)
+                        resOrPromise = resOrPromise.then(window.checkRemaining).catch(function (e) {
+                            debugger;
+                            return Promise.reject(e);
+                        });
+                    else
+                        window.checkRemaining(resOrPromise);
                 }
                 this.termResults[key] = resOrPromise;
             }
@@ -3824,17 +3826,8 @@ RDF = {
                         var instSh = RDF.IRI("http://open-services.net/ns/core#instanceShape", RDF.Position0());
                         var nestedValidatorStuff = validatorStuff.push(s, instSh);
                         var resOrPromise = schema.validate(s, ruleLabel, db, nestedValidatorStuff, false);
-                        if (validatorStuff.async) {
-                            resOrPromise.then(postValidate).catch(function (e) {
-                                console.dir(e);
-                                debugger;
-                                RDF.message(e);
-                            });
-                            promises.push(resOrPromise);
-                        } else {
-                            postValidate(resOrPromise);
-                        }
-                        function postValidate (res) {
+                        
+                        window.postValidate = function postValidate (res) {
                             // If it passed or is indeterminate,
                             if (res.status !== RDF.DISPOSITION.FAIL) {
 
@@ -3844,7 +3837,19 @@ RDF = {
                                 ret.matchedTree(schema.ruleMap[ruleLabel], t, res);
                             }
                         }
-                    }
+                        
+                        if (validatorStuff.async) {
+                            resOrPromise.then(window.postValidate).catch(function (e) {
+                                console.dir(e);
+                                debugger;
+                                RDF.message(e);
+                            });
+                            promises.push(resOrPromise);
+                        } else {
+                            window.postValidate(resOrPromise);
+                        }
+                        
+		    }
                 });
             });
             function invokeHandlers () {
