@@ -1831,6 +1831,21 @@ RDF = {
                         if (validatorStuff.async)
                             promises.push(resOrPromise);
                     });
+
+                    function langStrCheck(passes) {
+                        var langs = [];
+                        for(var p in passes) {
+                            p = passes[p];
+
+                            if(!p.r.matches[0].triple.o.langtag || !p.r.matches[0].triple.o.langtag.lex) return false;
+
+                            if(langs.indexOf(p.r.matches[0].triple.o.langtag.lex) !== -1 ) return false;
+
+                            langs.push(p.r.matches[0].triple.o.langtag.lex);
+                        }
+
+                        return true;
+                    }
                     function postTest () {
                         if (inOpt && passes.length === 0) {
                             ret.status = min === 0 ? RDF.DISPOSITION.ZERO : RDF.DISPOSITION.NONE;
@@ -1838,7 +1853,7 @@ RDF = {
                         } else if (passes.length < _AtomicRule.min) {
                             ret.status = RDF.DISPOSITION.FAIL;
                             ret.error_belowMin(_AtomicRule.min, _AtomicRule);
-                        } else if (_AtomicRule.max !== null && passes.length > _AtomicRule.max) {
+                        } else if (_AtomicRule.max !== null && passes.length > _AtomicRule.max && !langStrCheck(passes)) {
                             ret.status = RDF.DISPOSITION.FAIL;
                             ret.error_aboveMax(_AtomicRule.max, _AtomicRule, passes[_AtomicRule.max].r);
                         }
