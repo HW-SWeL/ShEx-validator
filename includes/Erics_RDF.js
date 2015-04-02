@@ -1896,7 +1896,7 @@ RDF = {
                 if (validatorStuff.async) {
                     return pet.then(function () {
                         ret = handleNegation(ret);
-                        if(_AtomicRule.req_lev && _AtomicRule.req_lev.length > 0){
+                        if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
                             ret.status = RDF.DISPOSITION.PASS;
                         }
                         return ret;
