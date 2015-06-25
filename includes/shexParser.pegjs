@@ -164,7 +164,7 @@ arc             = CONCOMITANT _ '@' _ l:label _ r:repeatCount? _ p:properties? _
     if (p) ret.setRuleID(p);
     return ret;
 }
-                / req:REQ_LEVEL? _ bang:('!' _ )? inverse:('^' _ )? addative:('+' _ )? n:nameClass _ v:valueClass _ d:defahlt? _ r:repeatCount? _ p:properties? _ c:CodeMap {
+                / req:REQ_LEVEL _ bang:('!' _ )? inverse:('^' _ )? addative:('+' _ )? n:nameClass _ v:valueClass _ d:defahlt? _ r:repeatCount? _ p:properties? _ c:CodeMap {
     if (d)
         throw peg$buildException('default (='+d.toString()+') not currently supported', null, peg$reportedPos);
     var width = v._pos.offset-offset()+v._pos.width;
@@ -173,6 +173,18 @@ arc             = CONCOMITANT _ '@' _ l:label _ r:repeatCount? _ p:properties? _
     else
         r = {min: 1, max: 1};
     var ret = new RDF.AtomicRule(bang?true:false, inverse?true:false, addative?true:false, n, v, r.min, r.max, c, RDF.Position5(text(), line(), column(), offset(), width), req);
+    if (p) ret.setRuleID(p);
+    return ret;
+}
+                / bang:('!' _ )? inverse:('^' _ )? addative:('+' _ )? n:nameClass _ v:valueClass _ d:defahlt? _ r:repeatCount? _ p:properties? _ c:CodeMap {
+    if (d)
+      throw peg$buildException('default (='+d.toString()+') not currently supported', null, peg$reportedPos);
+    var width = v._pos.offset-offset()+v._pos.width;
+    if (r)
+        width = r.ends-offset();
+    else
+        r = {min: 1, max: 1};
+    var ret = new RDF.AtomicRule(bang?true:false, inverse?true:false, addative?true:false, n, v, r.min, r.max, c, RDF.Position5(text(), line(), column(), offset(), width));
     if (p) ret.setRuleID(p);
     return ret;
 }
