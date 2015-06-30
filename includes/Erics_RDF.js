@@ -1891,21 +1891,15 @@ RDF = {
                     }
                     return ret;
                 }
-                
+
 
                 if (validatorStuff.async) {
                     return pet.then(function () {
                         ret = handleNegation(ret);
-                        if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
-                            ret.status = RDF.DISPOSITION.PASS;
-                        }
                         return ret;
                     });
                 } else {
                     ret = handleNegation(ret);
-                    if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
-                        ret.status = RDF.DISPOSITION.PASS;
-                    }
                     return ret;
                 }
 
