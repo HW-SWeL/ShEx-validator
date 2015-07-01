@@ -110,8 +110,8 @@ function disjointInFailures(disjoint,failures){
     var contains = false;
     failures.forEach(function(f){
         f.errors.forEach(function(e){
-            console.log(e.rule.nameClass.term._pos._orig);
-            if (disjoint.nameClass.term._pos._orig === 
+            console.log("Disjoint property failing: " + e.rule.nameClass.term._pos._orig + " at requirement level " + e.rule.req_lev);
+            if (disjoint.nameClass.term._pos._orig ===
                 e.rule.nameClass.term._pos._orig)
                 contains = true;
         });
