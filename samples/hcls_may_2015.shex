@@ -264,16 +264,16 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:description rdf:langString,
 
     #Date created
-    `SHOULD` dct:created .,
+    `SHOULD` (dct:created  xsd:date | dct:created  xsd:dateTime | dct:created xsd:gYearMonth | dct:created xsd:gYear | dct:created xsd:dateTime),
 
     #Other dates
-    `MAY` pav:createdOn xsd:gYearMonth,
+    `MAY` (pav:createdOn xsd:date | pav:createdOn  xsd:dateTime | pav:createdOn xsd:gYearMonth | pav:createdOn xsd:gYear | pav:createdOn xsd:dateTime),
 
     #Other dates
-    `MAY` pav:authoredOn xsd:gYearMonth,
+    `MAY` (pav:authoredOn xsd:date | pav:authoredOn  xsd:dateTime | pav:authoredOn xsd:gYearMonth | pav:authoredOn xsd:gYear | pav:authoredOn xsd:dateTime)+,
 
     #Other dates
-    `MAY` pav:curatedOn xsd:gYearMonth,
+    `MAY` (pav:curatedOn xsd:date | pav:curatedOn  xsd:dateTime | pav:curatedOn xsd:gYearMonth | pav:curatedOn xsd:gYear | pav:curatedOn xsd:dateTime)+,
 
     #Creators
     `MUST` dct:creator IRI+,
@@ -294,7 +294,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:publisher IRI+,
 
     #Date of issue
-    `SHOULD` dct:issued .,
+    `SHOULD` (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime),
 
     #HTML page
     `SHOULD` foaf:page IRI,
@@ -490,16 +490,16 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:description rdf:langString,
 
     #Date created
-    `SHOULD` dct:created .,
+    `SHOULD` (dct:created  xsd:date | dct:created  xsd:dateTime | dct:created xsd:gYearMonth | dct:created xsd:gYear | dct:created xsd:dateTime),
 
     #Other dates
-    `MAY` pav:createdOn xsd:gYearMonth,
+    `MAY` (pav:createdOn xsd:date | pav:createdOn  xsd:dateTime | pav:createdOn xsd:gYearMonth | pav:createdOn xsd:gYear | pav:createdOn xsd:dateTime),
 
     #Other dates
-    `MAY` pav:authoredOn xsd:gYearMonth,
+    `MAY` (pav:authoredOn xsd:date | pav:authoredOn  xsd:dateTime | pav:authoredOn xsd:gYearMonth | pav:authoredOn xsd:gYear | pav:authoredOn xsd:dateTime)+,
 
     #Other dates
-    `MAY` pav:curatedOn xsd:gYearMonth,
+    `MAY` (pav:curatedOn xsd:date | pav:curatedOn  xsd:dateTime | pav:curatedOn xsd:gYearMonth | pav:curatedOn xsd:gYear | pav:curatedOn xsd:dateTime)+,
 
     #Creators
     `MUST` dct:creator IRI+,
@@ -520,7 +520,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:publisher IRI,
 
     #Date of issue
-    `SHOULD` dct:issued .,
+    `SHOULD` (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime),
 
     #HTML page
     `SHOULD` foaf:page IRI,
@@ -715,16 +715,16 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:description rdf:langString,
 
     #Date created
-    `SHOULD` dct:created .,
+    `SHOULD` (dct:created  xsd:date | dct:created  xsd:dateTime | dct:created xsd:gYearMonth | dct:created xsd:gYear | dct:created xsd:dateTime),
 
     #Other dates
-    `MAY` pav:createdOn xsd:gYearMonth,
+    `MAY` (pav:createdOn xsd:date | pav:createdOn  xsd:dateTime | pav:createdOn xsd:gYearMonth | pav:createdOn xsd:gYear | pav:createdOn xsd:dateTime),
 
     #Other dates
-    `MAY` pav:authoredOn xsd:gYearMonth,
+    `MAY` (pav:authoredOn xsd:date | pav:authoredOn  xsd:dateTime | pav:authoredOn xsd:gYearMonth | pav:authoredOn xsd:gYear | pav:authoredOn xsd:dateTime)+,
 
     #Other dates
-    `MAY` pav:curatedOn xsd:gYearMonth,
+    `MAY` (pav:curatedOn xsd:date | pav:curatedOn  xsd:dateTime | pav:curatedOn xsd:gYearMonth | pav:curatedOn xsd:gYear | pav:curatedOn xsd:dateTime)+,
 
     #Creators
     `MUST` dct:creator IRI+,
@@ -745,7 +745,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     `MUST` dct:publisher IRI,
 
     #Date of issue
-    `SHOULD` dct:issued .,
+    `SHOULD` (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime),
 
     #HTML page
     `SHOULD` foaf:page IRI,
