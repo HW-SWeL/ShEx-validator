@@ -132,7 +132,7 @@ UnaryExpression = i:_id? a:arc {
     return a;
 }
                 / inc:include { return inc; } // @@ default action sufficient?
-                / i:_id? '(' _ exp:OrExpression _ ')' _ r:repeatCount? _ c:CodeMap {
+                / i:_id? _ req:REQ_LEVEL? '(' _ exp:OrExpression _ ')' _ r:repeatCount? _ c:CodeMap {
     if (r)
         width = r.ends-offset();
     else
@@ -141,6 +141,9 @@ UnaryExpression = i:_id? a:arc {
         curSubject.pop();
     if (r.min === 1 && !Object.keys(c).length) {
         if (i) exp.setRuleID(i); // in case it has an ID but no triples.
+        if (req) {
+          exp.setReqLevel(req);
+        }
         return exp;
     }
     return new RDF.UnaryRule(exp, r.min !== 1 /* !!! extend to handle n-ary cardinality */, c, RDF.Position2(line(), column()));

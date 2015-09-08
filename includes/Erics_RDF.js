@@ -1724,8 +1724,10 @@ RDF = {
         this.label = undefined;
         this.setLabel = function (label) { this.label = label; };
         this.toKey = function () { return this.label.toString() + ' ' + this.toString(); };
+        this.setReqLevel = function (req_lev) { this.req_lev = req_lev; };
         this.toString = function (orig, schema) {
             var ret = '';
+            if (_req_lev) ret += '`' + _req_lev + '` ';
             if (reversed) ret += '^';
             ret += nameClass.toString(orig) + ' ';
             ret += valueClass.toString(orig, schema);
@@ -1891,21 +1893,15 @@ RDF = {
                     }
                     return ret;
                 }
-                
+
 
                 if (validatorStuff.async) {
                     return pet.then(function () {
                         ret = handleNegation(ret);
-                        if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
-                            ret.status = RDF.DISPOSITION.PASS;
-                        }
                         return ret;
                     });
                 } else {
                     ret = handleNegation(ret);
-                    if(["MAY", "SHOULD", "SHOULD NOT"].indexOf(_AtomicRule.req_lev) !== -1){
-                        ret.status = RDF.DISPOSITION.PASS;
-                    }
                     return ret;
                 }
 
@@ -2635,10 +2631,17 @@ RDF = {
         this.label = undefined;
         this.setLabel = function (label) { this.label = label; this.disjoints.map(function (r) { r.setLabel(label); }) ;};
         this.toKey = function () { return (this.label ? this.label.toString() + ' ' : '') + this.toString(); };
+        this.req_lev = undefined;
+        this.setReqLevel = function (req_lev) { this.req_lev = req_lev; };
         this.toString = function (orig) {
-            return '(' + this.disjoints.map(function (disj) {
+            var ret = '';
+            if (this.req_lev) {
+              ret += '`' + this.req_lev + '` ';
+            }
+            ret += '(' + this.disjoints.map(function (disj) {
                     return '(' + disj.toString(orig) + ')';
                 }).join("|\n") + ')';
+            return ret;
         },
             this.colorize = function (charmap, idMap, termStringToIds) {
                 // var ruleId = "r" + idMap.add(this.toKey());

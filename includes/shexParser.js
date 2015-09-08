@@ -136,7 +136,7 @@ module.exports = (function() {
         peg$c33 = { type: "literal", value: "(", description: "\"(\"" },
         peg$c34 = ")",
         peg$c35 = { type: "literal", value: ")", description: "\")\"" },
-        peg$c36 = function(i, exp, r, c) {
+        peg$c36 = function(i, req, exp, r, c) {
             if (r)
                 width = r.ends-offset();
             else
@@ -145,6 +145,9 @@ module.exports = (function() {
                 curSubject.pop();
             if (r.min === 1 && !Object.keys(c).length) {
                 if (i) exp.setRuleID(i); // in case it has an ID but no triples.
+                if (req) {
+                  exp.setReqLevel(req);
+                }
                 return exp;
             }
             return new RDF.UnaryRule(exp, r.min !== 1 /* !!! extend to handle n-ary cardinality */, c, RDF.Position2(line(), column()));
@@ -1332,7 +1335,7 @@ module.exports = (function() {
     }
 
     function peg$parseUnaryExpression() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12;
 
       s0 = peg$currPos;
       s1 = peg$parse_id();
@@ -1368,42 +1371,57 @@ module.exports = (function() {
             s1 = peg$c2;
           }
           if (s1 !== peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 40) {
-              s2 = peg$c32;
-              peg$currPos++;
-            } else {
-              s2 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c33); }
-            }
+            s2 = peg$parse_();
             if (s2 !== peg$FAILED) {
-              s3 = peg$parse_();
+              s3 = peg$parseREQ_LEVEL();
+              if (s3 === peg$FAILED) {
+                s3 = peg$c2;
+              }
               if (s3 !== peg$FAILED) {
-                s4 = peg$parseOrExpression();
+                if (input.charCodeAt(peg$currPos) === 40) {
+                  s4 = peg$c32;
+                  peg$currPos++;
+                } else {
+                  s4 = peg$FAILED;
+                  if (peg$silentFails === 0) { peg$fail(peg$c33); }
+                }
                 if (s4 !== peg$FAILED) {
                   s5 = peg$parse_();
                   if (s5 !== peg$FAILED) {
-                    if (input.charCodeAt(peg$currPos) === 41) {
-                      s6 = peg$c34;
-                      peg$currPos++;
-                    } else {
-                      s6 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c35); }
-                    }
+                    s6 = peg$parseOrExpression();
                     if (s6 !== peg$FAILED) {
                       s7 = peg$parse_();
                       if (s7 !== peg$FAILED) {
-                        s8 = peg$parserepeatCount();
-                        if (s8 === peg$FAILED) {
-                          s8 = peg$c2;
+                        if (input.charCodeAt(peg$currPos) === 41) {
+                          s8 = peg$c34;
+                          peg$currPos++;
+                        } else {
+                          s8 = peg$FAILED;
+                          if (peg$silentFails === 0) { peg$fail(peg$c35); }
                         }
                         if (s8 !== peg$FAILED) {
                           s9 = peg$parse_();
                           if (s9 !== peg$FAILED) {
-                            s10 = peg$parseCodeMap();
+                            s10 = peg$parserepeatCount();
+                            if (s10 === peg$FAILED) {
+                              s10 = peg$c2;
+                            }
                             if (s10 !== peg$FAILED) {
-                              peg$reportedPos = s0;
-                              s1 = peg$c36(s1, s4, s8, s10);
-                              s0 = s1;
+                              s11 = peg$parse_();
+                              if (s11 !== peg$FAILED) {
+                                s12 = peg$parseCodeMap();
+                                if (s12 !== peg$FAILED) {
+                                  peg$reportedPos = s0;
+                                  s1 = peg$c36(s1, s3, s6, s10, s12);
+                                  s0 = s1;
+                                } else {
+                                  peg$currPos = s0;
+                                  s0 = peg$c0;
+                                }
+                              } else {
+                                peg$currPos = s0;
+                                s0 = peg$c0;
+                              }
                             } else {
                               peg$currPos = s0;
                               s0 = peg$c0;
