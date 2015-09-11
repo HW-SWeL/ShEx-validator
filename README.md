@@ -1,4 +1,4 @@
-# ShEx-validator [![Build Status](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator.svg?branch=master)](https://travis-ci.org/HeriotWattMEng2015/ShEx-validator)
+# ShEx-validator [![Build Status](https://travis-ci.org/HW-SWeL/ShEx-validator.svg?branch=master)](https://travis-ci.org/HW-SWeL/ShEx-validator)
 
 Parses and a ShEx schema and RDF data file and validates the resources in the data against the shapes in the schema.
 
@@ -9,7 +9,7 @@ It is built on [Eric Prud'hommeaux's](http://www.w3.org/People/Eric/) [ShEx vali
 ## Installation
 
 ```sh
-npm install HeriotWattMEng2015/ShEx-validator
+npm install HW-SWeL/ShEx-validator
 ```
 
 ## Usage
@@ -126,7 +126,7 @@ start = <PersonShape>
 ### Tests
 Tests are done using Jasmine, and the test specifications are located in specs/.
 
-To run the tests do: 
+To run the tests do:
 ```sh
 npm test
 ```
