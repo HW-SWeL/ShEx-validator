@@ -1,0 +1,52 @@
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX dctype: <http://purl.org/dc/dcmitype/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+<Catalog> {
+  rdf:type (dcat:Catalog),
+  dct:title rdf:langString?,
+  dct:description rdf:langString?,
+  dct:issued xsd:dateTime?,
+  dct:modified xsd:dateTime?,
+  dct:language .*,
+  dct:publisher @<Agent>?,
+  dct:themes IRI*,
+  dct:license .?,
+  dct:rights .?,
+  dct:spatial .?,
+  dcat:dataset @<Dataset>*,
+  dcat:record .?,
+  foaf:homepage IRI?
+}
+
+<Agent> {
+  rdf:type (foaf:Agent),
+  foaf:name xsd:string*
+}
+
+<Dataset> {
+  rdf:type (dcat:Dataset),
+  dct:title rdf:langString?,
+  dct:description rdf:langString?,
+  dct:issued xsd:dateTime?,
+  dct:modified xsd:dateTime?,
+  dct:language .*,
+  dct:publisher @<Agent>?,
+  dct:accrualPeriodicity .?,
+  dct:identifier .?,
+  dct:temporal .?,
+  dcat:theme IRI*,
+  dct:relation IRI*,
+  dcat:keyword xsd:string*,
+  dcat:contactPoint .*,
+  dct:temporal .?,
+  dct:spatial .?,
+  dcat:distribution @<Distribution>*,
+  dcat:landingPage IRI*
+}
