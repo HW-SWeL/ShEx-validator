@@ -1,0 +1,88 @@
+PREFIX bdb: <http://vocabularies.bridgedb.org/ops#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dctypes: <http://purl.org/dc/dcmitype/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX freq: <http://purl.org/cld/freq/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX pav: <http://purl.org/pav/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX uniprot: <http://purl.uniprot.org/uniprot/>
+PREFIX void: <http://rdfs.org/ns/void#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX : <#>
+
+# VoID Header for the DrugBank RDF dataset
+<>
+	rdf:type void:DatasetDescription ;
+	dcterms:title "DrugBank VoID Description"@en ;
+	dcterms:description "The VoID description for the RDF representation of the DrugBank dataset."@en ;
+	pav:createdBy <https://orcid.org/0000-0002-5711-4872> ;
+	pav:createdOn "2012-10-30T16:08:36Z"^^xsd:dateTime ;
+	pav:lastUpdateOn "2013-08-23T16:00:00Z"^^xsd:dateTime ;
+	dcterms:issued "2013-08-23T16:00:00Z"^^xsd:dateTime ;
+	foaf:primaryTopic :drugbank_rdf .
+
+# Metadata about the original DrugBank dataset
+:drugbank rdf:type dctypes:Dataset ;
+	dcterms:title "DrugBank dataset"@en ;
+	dcterms:description "The DrugBank database is a unique bioinformatics and cheminformatics resource that combines detailed drug (i.e. chemical, pharmacological and pharmaceutical) data with comprehensive drug target (i.e. sequence, structure, and pathway) information. The database contains 6811 drug entries including 1528 FDA-approved small molecule drugs, 150 FDA-approved biotech (protein/peptide) drugs, 87 nutraceuticals and 5080 experimental drugs. Additionally, 4294 non-redundant protein (i.e. drug target/enzyme/transporter/carrier) sequences are linked to these drug entries. Each DrugCard entry contains more than 150 data fields with half of the information being devoted to drug/chemical data and the other half devoted to drug target or protein data."@en ;
+	dcterms:publisher <http://www.drugbank.ca/> ;
+	dcat:landingPage <http://www.drugbank.ca/> ;
+	dcterms:license <http://www.drugbank.ca/about#cite> ;
+	dcterms:issued "2009-01-01T00:00:00T"^^xsd:dateTime;
+	dcat:distribution :drugbank-distribution;
+	pav:version "2.5" ;
+	foaf:page <http://thedatahub.org/dataset/drugbank> ;
+	.
+
+# Metadata about the distribution of the DrugBank dataset
+:drugbank-distribution rdf:type dcat:Distribution ;
+	dcat:mediaType "text";
+	dcat:downloadURL <http://www.drugbank.ca/system/downloads/2.5/drugcards.zip>.
+
+
+# Metadata about the RDF representation of DrugBank
+:drugbank-rdf rdf:type void:Dataset ;
+	dcterms:title "DrugBank RDF"@en;
+	dcterms:description """An RDF representation of the DrugBank dataset taken from Free University of Berlin.
+
+	The DrugBank database is a unique bioinformatics and cheminformatics resource that combines detailed drug (i.e. chemical, pharmacological and pharmaceutical) data with comprehensive drug target (i.e. sequence, structure, and pathway) information. The database contains 6811 drug entries including 1528 FDA-approved small molecule drugs, 150 FDA-approved biotech (protein/peptide) drugs, 87 nutraceuticals and 5080 experimental drugs. Additionally, 4294 non-redundant protein (i.e. drug target/enzyme/transporter/carrier) sequences are linked to these drug entries. Each DrugCard entry contains more than 150 data fields with half of the information being devoted to drug/chemical data and the other half devoted to drug target or protein data."""@en;
+	dcterms:publisher <http://www4.wiwiss.fu-berlin.de/> ;
+	dcat:landingPage <http://www.drugbank.ca/> ;
+	dcterms:license <http://www.drugbank.ca/about#cite> ;
+	dcterms:issued 	"2010-08-31T00:00:00Z"^^xsd:dateTime;
+	void:dataDump <http://www4.wiwiss.fu-berlin.de/drugbank/drugbank_dump.nt> ;
+	pav:version "2.5" ;
+	pav:importedFrom :drugbank ;
+	pav:importedBy <mailto:anja@anjeve.de> ;
+	pav:importedOn "2008-11-17T20:52:39"^^xsd:dateTime ;
+	pav:createdWith <https://github.com/anjeve/lodd/tree/master/datasets/DrugBank> ;
+	void:subset :db-drugs, :db-targets ;
+	void:sparqlEndpoint <http://www4.wiwiss.fu-berlin.de/drugbank/sparql> ;
+	void:uriSpace "http://www4.wiwiss.fu-berlin.de/drugbank/resource/"^^xsd:string ;
+	void:vocabulary <http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
+		<http://www.w3.org/2002/07/owl#>,
+		<http://xmlns.com/foaf/0.1/>,
+		<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/>,
+		<http://www.w3.org/2000/01/rdf-schema#>;
+	foaf:page <http://www4.wiwiss.fu-berlin.de/drugbank/> ;
+	foaf:page <http://thedatahub.org/dataset/fu-berlin-drugbank> ;
+	void:triples "765936"^^xsd:integer .
+
+# Subset containing drug compound information
+:db-drugs rdf:type void:Dataset ;
+	void:uriSpace "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/"^^xsd:string ;
+	dcat:theme <http://semanticscience.org/resource/SIO_010038> ;
+	void:exampleResource <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00001> ;
+	void:triples "4772"^^xsd:integer .
+
+# Subset containing target information
+:db-targets rdf:type void:Dataset ;
+	void:uriSpace "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/"^^xsd:string ;
+	dcat:theme <http://semanticscience.org/resource/SIO_010423> ;
+	void:exampleResource <http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/1> .
