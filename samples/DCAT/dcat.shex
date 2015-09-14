@@ -10,34 +10,34 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 <Catalog> {
   rdf:type (dcat:Catalog),
-  dct:title rdf:langString?,
-  dct:description rdf:langString?,
-  dct:issued xsd:dateTime?,
-  dct:modified xsd:dateTime?,
+  dct:title xsd:string?,
+  dct:description xsd:string?,
+  (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime)?,
+  (dct:modified  xsd:date | dct:modified  xsd:dateTime | dct:modified xsd:gYearMonth | dct:modified xsd:gYear | dct:modified xsd:dateTime)?,
   dct:language .*,
-  dct:publisher @<Agent>?,
+  dct:publisher IRI?,
   dct:themes IRI*,
   dct:license .?,
   dct:rights .?,
   dct:spatial .?,
-  dcat:dataset @<Dataset>*,
+  dcat:dataset IRI*,
   dcat:record .?,
   foaf:homepage IRI?
 }
 
 <Agent> {
-  rdf:type (foaf:Agent),
+  rdf:type (foaf:Agent foaf:Organization foaf:Person foaf:Group),
   foaf:name xsd:string*
 }
 
 <Dataset> {
   rdf:type (dcat:Dataset),
-  dct:title rdf:langString?,
-  dct:description rdf:langString?,
-  dct:issued xsd:dateTime?,
-  dct:modified xsd:dateTime?,
+  dct:title xsd:string?,
+  dct:description xsd:string?,
+  (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime)?,
+  (dct:modified  xsd:date | dct:modified  xsd:dateTime | dct:modified xsd:gYearMonth | dct:modified xsd:gYear | dct:modified xsd:dateTime)?,
   dct:language .*,
-  dct:publisher @<Agent>?,
+  dct:publisher IRI?,
   dct:accrualPeriodicity .?,
   dct:identifier .?,
   dct:temporal .?,
@@ -47,6 +47,31 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   dcat:contactPoint .*,
   dct:temporal .?,
   dct:spatial .?,
-  dcat:distribution @<Distribution>*,
+  dcat:distribution IRI*,
   dcat:landingPage IRI*
+}
+
+<Distribution> {
+  rdf:type (dcat:Distribution),
+  dct:title xsd:string?,
+  dct:description xsd:string?,
+  (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime)?,
+  (dct:modified  xsd:date | dct:modified  xsd:dateTime | dct:modified xsd:gYearMonth | dct:modified xsd:gYear | dct:modified xsd:dateTime)?,
+  dct:language .*,
+  dct:license .?,
+  dct:rights .?,
+  dcat:accessURL IRI?,
+  dcat:downloadURL IRI?,
+  dcat:mediaType .?,
+  dct:format .?,
+  dcat:byteSize xsd:decimal?
+}
+
+<CatalogRecord> {
+  rdf:type (dcat:CatalogRecord),
+  dct:title xsd:string?,
+  dct:description xsd:string?,
+  (dct:issued xsd:date | dct:issued  xsd:dateTime | dct:issued xsd:gYearMonth | dct:issued xsd:gYear | dct:issued xsd:dateTime)?,
+  (dct:modified  xsd:date | dct:modified  xsd:dateTime | dct:modified xsd:gYearMonth | dct:modified xsd:gYear | dct:modified xsd:dateTime)?,
+  foaf:primaryTopic IRI
 }

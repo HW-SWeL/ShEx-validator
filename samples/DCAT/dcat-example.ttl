@@ -1,0 +1,54 @@
+### Example taken from the DCAT specification document.
+### Example will validate with a single error, that of the use of rdfs:label.
+### The use of rdfs:label is not specified in the DCAT document.
+### Validating without the closed world assumption set will enable the example to validate successfully.
+
+
+PREFIX : <http://example.com/dcat#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX dctype: <http://purl.org/dc/dcmitype/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+:catalog
+  a dcat:Catalog ;
+  dct:title "Imaginary Catalog" ;
+  rdfs:label "Imaginary Catalog" ;
+  foaf:homepage <http://example.org/catalog> ;
+  dct:publisher :transparency-office ;
+  dct:language <http://id.loc.gov/vocabulary/iso639-1/en>  ;
+  dcat:dataset :dataset-001  , :dataset-002 , :dataset-003 ;
+.
+
+:transparency-office
+  a foaf:Organization ;
+  rdfs:label "Transparency Office" ;
+.
+
+:dataset-001
+  a dcat:Dataset ;
+  dct:title "Imaginary dataset" ;
+  dcat:keyword "accountability","transparency" ,"payments" ;
+  dct:issued "2011-12-05"^^xsd:date ;
+  dct:modified "2011-12-05"^^xsd:date ;
+  dcat:contactPoint <http://example.org/transparency-office/contact> ;
+  dct:temporal <http://reference.data.gov.uk/id/quarter/2006-Q1> ;
+  dct:spatial <http://www.geonames.org/6695072> ;
+  dct:publisher :finance-ministry ;
+  dct:language <http://id.loc.gov/vocabulary/iso639-1/en>  ;
+  dct:accrualPeriodicity <http://purl.org/linked-data/sdmx/2009/code#freq-W>  ;
+  dcat:distribution :dataset-001-csv ;
+.
+
+:dataset-001-csv
+  a dcat:Distribution ;
+  dcat:downloadURL <http://www.example.org/files/001.csv> ;
+  dct:title "CSV distribution of imaginary dataset 001" ;
+  dcat:mediaType "text/csv" ;
+  dcat:byteSize "5120"^^xsd:decimal ;
+.
