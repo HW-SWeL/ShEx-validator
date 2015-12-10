@@ -25,8 +25,8 @@ PREFIX sio: <http://semanticscience.org/resource/>
   `MUST` foaf:primaryTopic IRI,
   `SHOULD` pav:createdBy IRI*,
   `SHOULD` pav:previousVersion IRI,
-  `MAY` dcterms:title rdf:langString,
-  `MAY` dcterms:description rdf:langString,
+  `MAY` (dcterms:title rdf:langString | dcterms:title xsd:string),
+  `MAY` (dcterms:description rdf:langString | dcterms:description xsd:string),
   `MAY` pav:createdOn xsd:dateTime,
   `MAY` pav:lastUpdateOn xsd:dateTime,
   `MAY` pav:createdWith IRI
@@ -34,8 +34,8 @@ PREFIX sio: <http://semanticscience.org/resource/>
 
 <RDFDatasetShape> {
   `MUST` rdf:type (void:Dataset),
-  `MUST` dcterms:title rdf:langString,
-  `MUST` dcterms:description rdf:langString,
+  `MUST` (dcterms:title rdf:langString | dcterms:title xsd:string),
+  `MUST` (dcterms:description rdf:langString | dcterms:description xsd:string),
   `MUST` dcterms:publisher IRI,
   `MUST` dcat:landingPage IRI,
   `MUST` dcterms:license IRI,
@@ -61,8 +61,8 @@ PREFIX sio: <http://semanticscience.org/resource/>
 
 <NonRDFDatasetShape> {
   `MUST` rdf:type (dctypes:Dataset),
-  `MUST` dcterms:title rdf:langString,
-  `MUST` dcterms:description rdf:langString,
+  `MUST` (dcterms:title rdf:langString | dcterms:title xsd:string),
+  `MUST` (dcterms:description rdf:langString | dcterms:description xsd:string),
   `MUST` dcterms:publisher IRI,
   `MUST` dcat:landingPage IRI,
   `MUST` dcterms:license IRI,
@@ -98,8 +98,8 @@ PREFIX sio: <http://semanticscience.org/resource/>
 
 <LinksetShape> {
   `MUST` rdf:type (void:Linkset),
-  `MUST` dcterms:title rdf:langString,
-  `MUST` dcterms:description rdf:langString,
+  `MUST` (dcterms:title rdf:langString | dcterms:title xsd:string),
+  `MUST` (dcterms:description rdf:langString | dcterms:description xsd:string),
   `MUST` dcterms:publisher IRI,
   `MUST` dcterms:license IRI,
   `MUST` dcterms:issued xsd:dateTime,
