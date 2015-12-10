@@ -3,7 +3,6 @@ PREFIX cito: <http://purl.org/spar/cito/>
 PREFIX dcat: <http://www.w3.org/ns/dcat#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dctypes: <http://purl.org/dc/dcmitype/>
-PREFIX eco: <http://purl.obolibrary.org/obo/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX freq: <http://purl.org/cld/freq/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -13,6 +12,12 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+PREFIX cheminf: <http://semanticscience.org/resource/>
+PREFIX eco: <http://purl.obolibrary.org/obo/>
+PREFIX edam: <http://edamontology.org/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX sio: <http://semanticscience.org/resource/>
 
 <DocumentDescriptionShape> {
   `MUST` rdf:type (void:DatasetDescription),
@@ -89,4 +94,29 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   `SHOULD` dcat:byteSize xsd:integer,
   `SHOULD` pav:version xsd:string,
   `SHOULD` pav:previousVersion IRI
+}
+
+<LinksetShape> {
+  `MUST` rdf:type (void:Linkset),
+  `MUST` dcterms:title rdf:langString,
+  `MUST` dcterms:description rdf:langString,
+  `MUST` dcterms:publisher IRI,
+  `MUST` dcterms:license IRI,
+  `MUST` dcterms:issued xsd:dateTime,
+  `MUST` void:dataDump IRI,
+  `MUST` (void:subjectsTarget @<RDFDatasetShape> | void:subjectsTarget @<NonRDFDatasetShape> | void:subjectsTarget IRI),
+  `MUST` bdb:subjectsDatatype (sio:SIO_001166 sio:SIO_010004 sio:SIO_010299 sio:SIO_010038 sio:SIO_010035 sio:SIO_010432 sio:SIO_010099 sio:SIO_001107 sio:SIO_010043 sio:SIO_010009 sio:SIO_010423),
+  `MUST` (void:objectsTarget @<RDFDatasetShape> | void:objectsTarget @<NonRDFDatasetShape> | void:objectsTarget IRI),
+  `MUST` bdb:objectsDatatype (sio:SIO_001166 sio:SIO_010004 sio:SIO_010299 sio:SIO_010038 sio:SIO_010035 sio:SIO_010432 sio:SIO_010099 sio:SIO_001107 sio:SIO_010043 sio:SIO_010009 sio:SIO_010423),
+  void:linkPredicate IRI,
+  bdb:linksetJustification (sio:SIO_010004 cheminf:CHEMINF_000480 cheminf:CHEMINF_000459 cheminf:CHEMINF_000486 cheminf:CHEMINF_000458 obo:has_part cheminf:CHEMINF_000456 cheminf:CHEMINF_000460 cheminf:CHEMINF_000059 obo:is_tautomer_of sio:SIO_001107 edam:data_2342 sio:SIO_000986 sio:SIO_010035 sio:SIO_010099 sio:SIO_010043 sio:SIO_000985 edam:data_1460 sio:SIO_010009 sio:SIO_010423 sio:SIO_001166 sio:SIO_001171),
+  bdb:assertionMethod (eco:ECO_0000203 eco:ECO_0000218),
+  `SHOULD` void:subset IRI,
+  `SHOULD` bdb:subjectsSpecies (obo:NCBITaxon_9913 obo:NCBITaxon_6239 obo:NCBITaxon_9615 obo:NCBITaxon_7955 obo:NCBITaxon_7227 obo:NCBITaxon_9796 obo:NCBITaxon_9031 obo:NCBITaxon_9606 obo:NCBITaxon_10090 obo:NCBITaxon_9598 obo:NCBITaxon_10116 obo:NCBITaxon_4932),
+  `SHOULD` bdb:objectsSpecies (obo:NCBITaxon_9913 obo:NCBITaxon_6239 obo:NCBITaxon_9615 obo:NCBITaxon_7955 obo:NCBITaxon_7227 obo:NCBITaxon_9796 obo:NCBITaxon_9031 obo:NCBITaxon_9606 obo:NCBITaxon_10090 obo:NCBITaxon_9598 obo:NCBITaxon_10116 obo:NCBITaxon_4932),
+  `MAY` pav:authoredBy IRI,
+  `MAY` pav:authoredOn xsd:dateTime,
+  `MAY` pav:createdBy IRI,
+  `MAY` pav:createdOn xsd:dateTime,
+  `MAY` pav:createdWith IRI
 }
