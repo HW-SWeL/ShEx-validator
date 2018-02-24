@@ -39,12 +39,8 @@ Validator.prototype = {
     findShapes: function () {
         var _this = this;
         return Promise.all([this.schema, this.data]).then(function (a) {
-            return shapeFinder.findShapes(
-                a[0].schema,                       // Schema
-                a[0].resolver,
-                a[1].db,                       // db
-                _this.options.closedShapes,
-                _this.callbacks.findShapesResult);
+            console.log(this.schema);
+            console.log(this.data);
         });
     },
     validate: function(startingNodes) {
