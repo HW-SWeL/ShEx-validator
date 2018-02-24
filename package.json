@@ -19,9 +19,9 @@
   "dependencies": {
     "exit": "^0.1.2",
     "minimist": "^1.1.0",
-    "n3": "latest",
+    "n3": "0.11.2",
     "promise": "^6.1.0",
-    "shex":"latest"
+    "shex":"0.9.1"
   },
   "devDependencies": {
     "mocha": "^2.2.1",
