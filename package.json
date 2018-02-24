@@ -19,8 +19,9 @@
   "dependencies": {
     "exit": "^0.1.2",
     "minimist": "^1.1.0",
-    "n3": "git://github.com/HeriotWattMEng2015/N3.js",
-    "promise": "^6.1.0"
+    "n3": "latest",
+    "promise": "^6.1.0",
+    "shex":"latest"
   },
   "devDependencies": {
     "mocha": "^2.2.1",
