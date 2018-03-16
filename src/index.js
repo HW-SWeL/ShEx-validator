@@ -39,12 +39,14 @@ Validator.prototype = {
     findShapes: function () {
         var _this = this;
         return Promise.all([this.schema, this.data]).then(function (a) {
+            console.log('showing shapes');
             console.log(this.schema);
             console.log(this.data);
         });
     },
     validate: function(startingNodes) {
         var _this = this;
+        console.log('validate function',_this);
         return Promise.all([this.schema, this.data]).then(function (a) {
             return validator.validate(
                 a[0].schema,                       // Schema
