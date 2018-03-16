@@ -47,7 +47,7 @@ Validator.prototype = {
     validate: function(startingNodes) {
         var _this = this;
         console.log('validate function',_this);
-        return Promise.all([this.schema, this.data]).then(function (a) {
+        return Promise.all([this.schema, this.data, this.options]).then(function (a) {
             console.log(a);
             return validator.validate(
                 a[0].schema,                       // Schema
