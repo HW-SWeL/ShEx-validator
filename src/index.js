@@ -17,9 +17,9 @@ function Validator(schemaText, dataText, callbacks, options) {
     this.updateSchema(location.origin + '/schema.shex', schemaText);
     this.updateData(dataText);
     
-    console.log("validator has instantiated");
-    console.log("callbacks:\n",callbacks);
-    console.log("options:\n",options);
+    // console.log("validator has instantiated");
+    // console.log("callbacks:\n",callbacks);
+    // console.log("options:\n",options);
 
 }
 
@@ -48,6 +48,7 @@ Validator.prototype = {
         var _this = this;
         console.log('validate function',_this);
         return Promise.all([this.schema, this.data]).then(function (a) {
+            console.log(a);
             return validator.validate(
                 a[0].schema,                       // Schema
                 a[0].resolver,
