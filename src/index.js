@@ -111,7 +111,7 @@ function cleanResult(result, callback){
         solutions = result.solution.solutions;
     }
     return callback({
-            errors: errors
+            errors: errors,
             matches: solutions,
             startingResource: 'startingResource',
             passed: errors.length === 0
