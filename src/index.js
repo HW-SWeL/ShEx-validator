@@ -110,6 +110,7 @@ function cleanResult(result, callback){
     } else {
         solutions = result.solution.solutions;
     }
+    console.log('errors',errors,'passed',errors.length === 0);
     return callback({
             errors: errors,
             matches: solutions,
