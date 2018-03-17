@@ -61,7 +61,7 @@ Validator.prototype = {
             //     a[1].resolver,
             //     _this.options.closedShapes,
             //     _this.callbacks.validationResult);
-            return result
+            return cleanResult(result, _this.callbacks.validationResult)
         });
     }
 };
@@ -105,8 +105,8 @@ function cleanResult(result, callback){
     console.log('validation result',result);
     return callback({
             errors: errors,
-            matches: valRes.matches,
-            startingResource: startingResource,
+            matches: result.matches,
+            startingResource: 'startingResource',
             passed: errors.length === 0
         });
 }
