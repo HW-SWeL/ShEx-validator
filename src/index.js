@@ -108,7 +108,7 @@ function cleanResult(result, callback){
     if (result.type == 'Failure'){
         errors = result.errors;
     } else {
-        solutions = result.solution.solutions
+        solutions = result.solution.solutions;
     }
     return callback({
             errors: errors
