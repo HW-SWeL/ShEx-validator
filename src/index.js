@@ -102,10 +102,17 @@ function parseSchema(base, schemaText) {
 };
 
 function cleanResult(result, callback){
-    console.log('validation result',result);
+    console.log('validation result', result);
+    var errors = [];
+    var solutions = [];
+    if (result.type == 'Failure'){
+        errors = result.errors;
+    } else {
+        solutions = result.solution.solutions
+    }
     return callback({
-            errors: errors,
-            matches: result.matches,
+            errors: errors
+            matches: solutions,
             startingResource: 'startingResource',
             passed: errors.length === 0
         });
