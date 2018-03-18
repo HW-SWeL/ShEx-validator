@@ -1,10 +1,4 @@
 var Promise = require('promise');
-
-var dataParser = require("./dataParser.js");
-var schemaParser = require("./schemaParser.js");
-var validator = require("./validator.js");
-var shapeFinder = require("./shapeFinder.js");
-
 var shexjs = require("shex");
 var n3 = require("n3");
 
