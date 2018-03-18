@@ -105,25 +105,13 @@ function cleanResult(result, callback){
         solutions = result.solution.solutions;
     }
     console.log('errors',errors,'passed',errors.length === 0);
-    return callback({
+    var clean_result = {
             errors: errors,
             matches: solutions,
             startingResource: 'startingResource',
             passed: errors.length === 0
-        });
+        };
+    console.log('clean_result',clean_result);
+    return callback(clean_result);
 }
 
-function cleanupValidation(valRes, resolver, startingResource, cb) {
-
-    return valRes.then(function(valRes) {
-        var errors = valRes.errors.map(errorFormatter);
-
-        cb({
-            errors: errors,
-            matches: valRes.matches,
-            startingResource: startingResource,
-            passed: errors.length === 0
-        });
-    });
-
-}
