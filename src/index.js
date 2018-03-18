@@ -109,7 +109,8 @@ function cleanResult(result, callback){
             errors: errors,
             matches: solutions,
             startingResource: 'startingResource',
-            passed: errors.length === 0
+            passed: errors.length === 0,
+            full_result:result
         };
     console.log('clean_result',clean_result);
     return callback(clean_result);
