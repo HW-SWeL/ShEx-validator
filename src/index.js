@@ -115,3 +115,14 @@ function cleanResult(result, callback){
     return callback(clean_result);
 }
 
+function parseN3Error(error) {
+    var line = error.message.match(/line [0-9]*/g);
+
+    line = (line && line.length > 0 && line[0].length > 5)?Number(line[0].substr(5)):null;
+
+    return {
+        message: error.message,
+        line: line,
+        column: 0
+    }
+}
