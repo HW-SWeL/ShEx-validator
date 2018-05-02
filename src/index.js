@@ -63,6 +63,8 @@ Validator.prototype = {
 module.exports.Validator = Validator;
 
 function parseData(dataText){
+    console.log('split data');
+    console.log(dataText.split("\n"));
     return new Promise(function (resolve, reject) {
 
         var db = n3.Store();
