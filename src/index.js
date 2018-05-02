@@ -67,6 +67,7 @@ function parseData(dataText){
 
         var db = n3.Store();
         n3.Parser({documentIRI: DefaultBase, format: "text/turtle"}).parse(dataText, function (error, triple, prefixes) {
+            console.log('db', db);
             if (error) {
                 // throw Error("error parsing " + data + ": " + error);
                 reject(parseN3Error(error));
