@@ -68,7 +68,7 @@ function parseData(dataText){
     return new Promise(function (resolve, reject) {
 
         var db = n3.Store();
-        n3.Parser({documentIRI: DefaultBase, format: "text/turtle"}).parse(dataText, function (error, triple, prefixes) {
+        n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             console.log('db', db);
             console.log('DB');
             if (error) {
