@@ -76,7 +76,7 @@ function parseData(dataText){
                 reject(parseN3Error(error));
             } else if (triple) {
                 console.log("N3triple",triple);
-                triple.line = N3triple.line;
+                // triple.line = N3triple.line;
                 db.addTriple(triple)
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
