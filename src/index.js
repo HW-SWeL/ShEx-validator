@@ -46,6 +46,7 @@ Validator.prototype = {
             var node = Object.keys(a[2].resourceShapeMap)[0];
             var result = shexjs.Validator.construct(a[0].schema).validate(a[1].db, node, a[2].resourceShapeMap[node]);
             console.log('callbacks in validator',_this.callbacks);
+            console.log('db to validate',a[1].db)
             // console.log('validation results:',result);
             // return validator.validate(
             //     a[0].schema,                       // Schema
