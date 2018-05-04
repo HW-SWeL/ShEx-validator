@@ -78,7 +78,7 @@ function parseData(dataText){
             } else if (triple) {
                 console.log("N3triple",triple);
                 // triple.line = N3triple.line;
-                db.addTriple(triple)
+                db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
                 resolve({db: db, triples:db.getTriples()});
