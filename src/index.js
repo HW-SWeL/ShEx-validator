@@ -122,7 +122,7 @@ function cleanResult(result, lineIndex, callback){
     var clean_result = {
             errors: errors,
             matches: solutions,
-            startingResource: 'startingResource',
+            startingResource: result.node,
             passed: errors.length === 0,
             full_result:result
         };
