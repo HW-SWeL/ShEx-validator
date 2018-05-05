@@ -67,7 +67,7 @@ function parseData(dataText){
     console.log('split data');
     console.log(dataText.split("\n"));
     return new Promise(function (resolve, reject) {
-        var lineIndex = {};
+        var lineIndex = new Object();
         var db = n3.Store();
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
