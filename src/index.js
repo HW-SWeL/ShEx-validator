@@ -56,7 +56,7 @@ Validator.prototype = {
             //     a[1].resolver,
             //     _this.options.closedShapes,
             //     _this.callbacks.validationResult);
-            return cleanResult(result, _this.callbacks.validationResult)
+            return cleanResult(result,a[1].index, _this.callbacks.validationResult)
         });
     }
 };
@@ -104,16 +104,17 @@ function parseSchema(base, schemaText) {
     });
 };
 
-function cleanResult(result, callback){
+function cleanResult(result, lineIndex, callback){
     console.log('validation result', result);
     var errors = [];
     var solutions = [];
     if (result.type == 'Failure'){
         errors = result.errors;
+        console.log('errors',errors);
+        console.log('lineIndex',lineIndex);
     } else {
         solutions = result.solution.solutions;
     }
-    console.log('errors',errors,'passed',errors.length === 0);
     var clean_result = {
             errors: errors,
             matches: solutions,
