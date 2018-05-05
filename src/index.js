@@ -83,7 +83,7 @@ function parseData(dataText){
                 db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
-                resolve({db: db, triples:db.getTriples(),index:lineIndex});
+                resolve({db: db, index:lineIndex});
             }
         });
         
