@@ -67,7 +67,7 @@ function parseData(dataText){
     console.log('split data');
     console.log(dataText.split("\n"));
     return new Promise(function (resolve, reject) {
-
+        var lineIndex = {};
         var db = n3.Store();
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
@@ -78,11 +78,11 @@ function parseData(dataText){
                 reject(parseN3Error(error));
             } else if (triple) {
                 console.log("N3triple",triple);
-                // triple.line = N3triple.line;
+                lineIndex[{'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph}] = triple.line;
                 db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
-                resolve({db: db, triples:db.getTriples()});
+                resolve({db: db, triples:db.getTriples(),index:lineIndex});
             }
         });
         
