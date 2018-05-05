@@ -78,7 +78,7 @@ function parseData(dataText){
                 reject(parseN3Error(error));
             } else if (triple) {
                 console.log("N3triple",triple);
-                lineIndex[JSON.stringify({'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph})] = triple.line;
+                lineIndex[JSON.stringify({'subject':triple.subject,'object':triple.object,'predicate':triple.predicate,'graph':triple.graph})] = triple.line;
                 // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
                 db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
