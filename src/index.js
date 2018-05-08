@@ -10,23 +10,15 @@ function Validator(schemaText, dataText, callbacks, options) {
     
     this.updateSchema(location.origin + '/schema.shex', schemaText);
     this.updateData(dataText);
-    // console.log("validator has instantiated");
-    // console.log("callbacks:\n",callbacks);
-    // console.log("options:\n",options);
-
 }
 
 Validator.prototype = {
     updateSchema: function (base, schemaText) {
         this.schema = parseSchema(base ,schemaText);
-        // this.schema = schemaParser.parseSchema(schemaText);
         this.schema.done(this.callbacks.schemaParsed, this.callbacks.schemaParseError);
-        // var _schema = shexjs.Parser.construct(DefaultBase).parse(schemaText);
-        // console.log('UPDATING THE FUCKIGN Schema',this.schema, _schema);
     },
     updateData: function (dataText) {
         this.data = parseData(dataText);
-        // this.data = dataParser.parseData(dataText);
         this.data.done(this.callbacks.dataParsed, this.callbacks.dataParseError);
     },
     findShapes: function () {
@@ -118,12 +110,9 @@ function cleanResult(result, parsedTriples, callback){
         console.log('errors',errors);
         // console.log('lineIndex',lineIndex);
         for (var i = errors.length - 1; i >= 0; i--) {
-
-            // var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
             errors[i].line = parsedTriples.find(function (triple) { return triple.subject === errors[i].triple.subject &&
                                                                             triple.predicate === errors[i].triple.predicate &&
                                                                             triple.object === errors[i].triple.object; }).line;
-
         }
     } else {
         solutions = result.solution;
