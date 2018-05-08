@@ -85,7 +85,7 @@ function parseData(dataText){
             } else {
                 var triples = db.getTriples();
                 for (var i = triples.length - 1; i >= 0; i--) {
-                    var triple_key = JSON.stringify({'subject':triples[i].triple.subject,'predicate':triples[i].triple.predicate,'object':triples[i].triple.object,'graph':""});
+                    var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
                     triples[i].line = lineIndex[triple_key];
                 }
                 resolve({db: db, triples:triples,index:lineIndex});
