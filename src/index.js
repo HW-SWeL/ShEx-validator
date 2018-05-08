@@ -117,7 +117,7 @@ function cleanResult(result, lineIndex, callback){
             errors[i].line = lineIndex[triple_key];
         }
     } else {
-        solutions = result.solution.solutions;
+        solutions = result.solution;
     }
     var clean_result = {
             errors: errors,
