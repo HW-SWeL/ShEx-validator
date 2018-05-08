@@ -83,7 +83,7 @@ function parseData(dataText){
                 db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
-                var triples = b.getTriples();
+                var triples = db.getTriples();
                 for (var i = triples.length - 1; i >= 0; i--) {
                     var triple_key = JSON.stringify({'subject':triples[i].triple.subject,'predicate':triples[i].triple.predicate,'object':triples[i].triple.object,'graph':""});
                     triples[i].line = lineIndex[triple_key];
@@ -118,7 +118,7 @@ function cleanResult(result, lineIndex, callback){
         console.log('errors',errors);
         console.log('lineIndex',lineIndex);
         for (var i = errors.length - 1; i >= 0; i--) {
-            var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""})
+            var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
             errors[i].line = lineIndex[triple_key];
         }
     } else {
