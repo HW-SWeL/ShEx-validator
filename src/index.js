@@ -56,7 +56,7 @@ Validator.prototype = {
             //     a[1].resolver,
             //     _this.options.closedShapes,
             //     _this.callbacks.validationResult);
-            return cleanResult(result,a[1].index, _this.callbacks.validationResult)
+            return cleanResult(result, _this.callbacks.validationResult)
         });
     }
 };
@@ -88,7 +88,7 @@ function parseData(dataText){
                     var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
                     triples[i].line = lineIndex[triple_key];
                 }
-                resolve({db: db, triples:triples,index:lineIndex});
+                resolve({db: db, triples:triples});
             }
         });
         
@@ -109,18 +109,18 @@ function parseSchema(base, schemaText) {
     });
 };
 
-function cleanResult(result, lineIndex, callback){
+function cleanResult(result, callback){
     console.log('validation result', result);
     var errors = [];
     var solutions = [];
     if (result.type == 'Failure'){
         errors = result.errors;
         console.log('errors',errors);
-        console.log('lineIndex',lineIndex);
-        for (var i = errors.length - 1; i >= 0; i--) {
-            var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
-            errors[i].line = lineIndex[triple_key];
-        }
+        // console.log('lineIndex',lineIndex);
+        // for (var i = errors.length - 1; i >= 0; i--) {
+        //     var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
+        //     errors[i].line = lineIndex[triple_key];
+        // }
     } else {
         solutions = result.solution;
     }
