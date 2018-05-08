@@ -86,7 +86,7 @@ function parseData(dataText){
                 var triples = b.getTriples();
                 for (var i = triples.length - 1; i >= 0; i--) {
                     var triple_key = JSON.stringify({'subject':triples[i].triple.subject,'predicate':triples[i].triple.predicate,'object':triples[i].triple.object,'graph':""});
-                    triples[i] = lineIndex[triple_key];
+                    triples[i].line = lineIndex[triple_key];
                 }
                 resolve({db: db, triples:triples,index:lineIndex});
             }
