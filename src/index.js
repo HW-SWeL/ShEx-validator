@@ -106,14 +106,7 @@ function cleanResult(result, parsedTriples, callback){
     var errors = [];
     var solutions = [];
     if (result.type == 'Failure'){
-        errors = result.errors;
-        console.log('errors',errors);
-        // console.log('lineIndex',lineIndex);
-        for (var i = errors.length - 1; i >= 0; i--) {
-            errors[i].line = parsedTriples.find(function (triple) { return triple.subject === errors[i].triple.subject &&
-                                                                            triple.predicate === errors[i].triple.predicate &&
-                                                                            triple.object === errors[i].triple.object; }).line;
-        }
+        errors = cleanErrors(parsedTriples, result);
     } else {
         solutions = result.solution;
     }
@@ -124,7 +117,6 @@ function cleanResult(result, parsedTriples, callback){
             passed: errors.length === 0,
             full_result:result
         };
-    console.log('clean_result',clean_result);
     return callback(clean_result);
 }
 
@@ -140,27 +132,63 @@ function parseN3Error(error) {
     }
 }
 // returns the matched triples and the corresponding lines
-function cleanMatches(validResult){
+function cleanMatches(validationResult){
     var results = []
-    if (validResult.type == 'ShapeTest') {
-        cleanMatches(validResult.solution);
+    if (validationResult.type == 'ShapeTest') {
+        cleanMatches(validationResult.solution);
     }
-    else if (validResult.type == 'EachOfSolutions') {
+    else if (validationResult.type == 'EachOfSolutions') {
 
     }
-    else if (validResult.type == 'OneOfSolutions') {
+    else if (validationResult.type == 'OneOfSolutions') {
 
     }
-    else if (validResult.type == 'TripleConstraintSolutions') {
+    else if (validationResult.type == 'TripleConstraintSolutions') {
 
     }
-    else if (validResult.type == 'TestedTriple') {
+    else if (validationResult.type == 'TestedTriple') {
 
     }
-    else if (validResult instanceof Array){
-        for (var i = validResult.length - 1; i >= 0; i--) {
-            cleanMatches(validResult[i]);
+    else if (validationResult instanceof Array){
+        for (var i = validationResult.length - 1; i >= 0; i--) {
+            cleanMatches(validationResult[i]);
         }
     }
+    return results
+}
+
+function cleanErrors(parsedTriples, validationResult){
+    var results = []
+    var errors = validationResult.errors;
+
+    for (var i = errors.length - 1; i >= 0; i--) {
+        if (errors[i].triple) {
+                console.log(errors[i].triple.subject,parsedTriples[2].subject,errors[i].triple.subject == parsedTriples[2].subject);
+                console.log(errors[i].triple.predicate,parsedTriples[2].predicate,errors[i].triple.predicate == parsedTriples[2].predicate);
+                console.log(errors[i].triple.object,parsedTriples[2].object,errors[i].triple.object == parsedTriples[2].object);
+            try {
+
+                
+
+                errors[i].line = parsedTriples.find(function (triple) { return triple.subject === errors[i].triple.subject &&
+                                                                            triple.predicate === errors[i].triple.predicate &&
+                                                                            triple.object === errors[i].triple.object; }).line;
+                errors[i].message = String(errors[i].type) + ' on line ' + String(errors[i].line);
+            }
+            catch(error){
+                console.error(error);
+            }
+
+        }
+        else if (validationResult.type == 'MissingProperty') {
+            console.log('missing property error');
+
+        }
+        else {
+            console.log('VALIDATION ERROR:',errors.type);
+        }
+        results.push(errors[i]);
+    }
+
     return results
 }
