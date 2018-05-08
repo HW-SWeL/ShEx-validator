@@ -73,7 +73,7 @@ function parseData(dataText){
                 lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
                 // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
                 db.addTriple(triple);
-            // console.log(triple.subject, triple.predicate, triple.object, '.');
+
             } else {
                 var triples = db.getTriples();
                 for (var i = triples.length - 1; i >= 0; i--) {
