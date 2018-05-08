@@ -83,7 +83,12 @@ function parseData(dataText){
                 db.addTriple(triple);
             // console.log(triple.subject, triple.predicate, triple.object, '.');
             } else {
-                resolve({db: db, triples:db.getTriples(),index:lineIndex});
+                var triples = b.getTriples();
+                for (var i = triples.length - 1; i >= 0; i--) {
+                    var triple_key = JSON.stringify({'subject':triples[i].triple.subject,'predicate':triples[i].triple.predicate,'object':triples[i].triple.object,'graph':""});
+                    triples[i] = lineIndex[triple_key];
+                }
+                resolve({db: db, triples:triples,index:lineIndex});
             }
         });
         
@@ -140,4 +145,29 @@ function parseN3Error(error) {
         line: line,
         column: 0
     }
+}
+// returns the matched triples and the corresponding lines
+function cleanMatches(validResult){
+    var results = []
+    if (validResult.type == 'ShapeTest') {
+        cleanMatches(validResult.solution);
+    }
+    else if (validResult.type == 'EachOfSolutions') {
+
+    }
+    else if (validResult.type == 'OneOfSolutions') {
+
+    }
+    else if (validResult.type == 'TripleConstraintSolutions') {
+
+    }
+    else if (validResult.type == 'TestedTriple') {
+
+    }
+    else if (validResult instanceof Array){
+        for (var i = validResult.length - 1; i >= 0; i--) {
+            cleanMatches(validResult[i]);
+        }
+    }
+    return results
 }
