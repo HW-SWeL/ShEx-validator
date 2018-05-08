@@ -10,7 +10,7 @@ function Validator(schemaText, dataText, callbacks, options) {
     
     this.updateSchema(location.origin + '/schema.shex', schemaText);
     this.updateData(dataText);
-    
+    this.triples = [];
     // console.log("validator has instantiated");
     // console.log("callbacks:\n",callbacks);
     // console.log("options:\n",options);
@@ -56,7 +56,7 @@ Validator.prototype = {
             //     a[1].resolver,
             //     _this.options.closedShapes,
             //     _this.callbacks.validationResult);
-            return cleanResult(result, _this.callbacks.validationResult)
+            return cleanResult(result, a[1].triples, _this.callbacks.validationResult)
         });
     }
 };
@@ -66,6 +66,7 @@ module.exports.Validator = Validator;
 function parseData(dataText){
     console.log('split data');
     console.log(dataText.split("\n"));
+    console.log('this',this);
     return new Promise(function (resolve, reject) {
         var lineIndex = new Object();
         var db = n3.Store();
@@ -109,7 +110,7 @@ function parseSchema(base, schemaText) {
     });
 };
 
-function cleanResult(result, callback){
+function cleanResult(result, parsedTriples, callback){
     console.log('validation result', result);
     var errors = [];
     var solutions = [];
@@ -117,10 +118,10 @@ function cleanResult(result, callback){
         errors = result.errors;
         console.log('errors',errors);
         // console.log('lineIndex',lineIndex);
-        // for (var i = errors.length - 1; i >= 0; i--) {
-        //     var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
-        //     errors[i].line = lineIndex[triple_key];
-        // }
+        for (var i = errors.length - 1; i >= 0; i--) {
+            var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
+            errors[i].line = lineIndex[triple_key];
+        }
     } else {
         solutions = result.solution;
     }
