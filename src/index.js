@@ -118,8 +118,12 @@ function cleanResult(result, parsedTriples, callback){
         console.log('errors',errors);
         // console.log('lineIndex',lineIndex);
         for (var i = errors.length - 1; i >= 0; i--) {
-            var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
-            errors[i].line = lineIndex[triple_key];
+
+            // var triple_key = JSON.stringify({'subject':errors[i].triple.subject,'predicate':errors[i].triple.predicate,'object':errors[i].triple.object,'graph':""});
+            errors[i].line = parsedTriples.find(function (triple) { return triple.subject === errors[i].triple.subject &&
+                                                                            triple.predicate === errors[i].triple.predicate &&
+                                                                            triple.object === errors[i].triple.object; }).line;
+
         }
     } else {
         solutions = result.solution;
