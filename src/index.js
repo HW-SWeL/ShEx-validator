@@ -104,15 +104,17 @@ function parseSchema(base, schemaText) {
 function cleanResult(result, parsedTriples, callback){
     console.log('validation result', result);
     var errors = [];
-    var solutions = [];
+    var matches = [];
     if (result.type == 'Failure'){
         errors = cleanErrors(parsedTriples, result);
     } else {
-        solutions = result.solution;
+        matches = cleanMatches(parsedTriples, result);
+        // console.log('result',result);
+        // console.log('matches',matches);
     }
     var clean_result = {
             errors: errors,
-            matches: solutions,
+            matches: matches,
             startingResource: result.node,
             passed: errors.length === 0,
             full_result:result
@@ -132,64 +134,213 @@ function parseN3Error(error) {
     }
 }
 // returns the matched triples and the corresponding lines
-function cleanMatches(validationResult){
-    var results = []
-    if (validationResult.type == 'ShapeTest') {
-        cleanMatches(validationResult.solution);
-    }
-    else if (validationResult.type == 'EachOfSolutions') {
 
-    }
-    else if (validationResult.type == 'OneOfSolutions') {
+function cleanMatches(parsedTriples, validationResult){
+    var results = [];
+    var messages = [];
+    var matches = parseMatches(validationResult.solution);
+    for (var i = matches.length - 1; i >= 0; i--) {
+        var currentMatch = {};
+        currentMatch.line = matchTriple(parsedTriples, matches[i]).line;
+        currentMatch.subject = matches[i].subject;
+        currentMatch.predicate = matches[i].predicate;
 
-    }
-    else if (validationResult.type == 'TripleConstraintSolutions') {
+        if (matches[i].object.value && matches[i].object.type) {
+                currentMatch.object = '<type>:' +String(matches[i].object.type) +' <value>:'+ String(matches[i].object.value);
 
-    }
-    else if (validationResult.type == 'TestedTriple') {
 
-    }
-    else if (validationResult instanceof Array){
-        for (var i = validationResult.length - 1; i >= 0; i--) {
-            cleanMatches(validationResult[i]);
+        } else {
+            currentMatch.object = matches[i].object;
         }
+            currentMatch.message = 'Matched '+ String(currentMatch.predicate)+' '+ String(currentMatch.object) + ' on line ' + String(currentMatch.line);
+
+        // console.log('cleanMatches',matches[i]);
+
+        if (!messages.includes(currentMatch.message)){
+            results.push(currentMatch);
+            messages.push(currentMatch.message);
+        }
+
     }
+    // console.log('results returned',results);
     return results
 }
 
-function cleanErrors(parsedTriples, validationResult){
-    var results = []
-    var errors = validationResult.errors;
+function parseMatches(solution){
+    var results = [];
+    var values = Object.values(solution)
+    // console.log('object values',values);
+    for (var i = values.length - 1; i >= 0; i--) {
+        if (values[i].subject && values[i].predicate && values[i].object){
+            // console.log('istriple',values[i]);            
+            results.push(values[i]);
+        }
+        else if (typeof(values[i]) == 'string'){
+            // console.log('string found',values[i])
+        } else {
+            Array.prototype.push.apply(results,parseMatches(values[i]));
+        }
+    }
 
+    return results
+}
+
+function parseErrors(errors){
+    var results = [];
     for (var i = errors.length - 1; i >= 0; i--) {
-        if (errors[i].triple) {
+        if (Array.isArray(errors[i])){
+            console.log('rec call',errors[i]);
+            Array.prototype.push.apply(results,parseErrors(errors[i]));
+
+        } else {
+            console.log('non rec call',errors[i]);
+            results.push(errors[i])
+        }
+    }
+    console.log('results',results);
+    return results
+}
+
+function matchTriple(parsedTriples, keyTriple){
+    var match;
+
+    try {
+        match = parsedTriples.find(function (triple) {
+            var lookup = []
+            if (typeof(keyTriple.subject) == 'string' ){
+                if (triple.subject === keyTriple.subject){
+                    lookup.push(true)
+                } else{
+                    return false
+                }
+            } else {
+                lookup.push(true);
+            }
+            // console.log('subject',keyTriple.subject);
+
+            if (typeof(keyTriple.predicate) == 'string'){
+                if (triple.predicate === keyTriple.predicate){
+                    lookup.push(true);
+                } else {
+                    return false
+                }
+            }else {
+                lookup.push(true);
+            }
+            
+            // console.log('predicate',keyTriple.predicate);
+            
+            if (typeof(keyTriple.object) == 'string'){
+                if (triple.object === keyTriple.object){
+                    lookup.push(true);
+                } else {
+                    return false
+                }
+            }else {
+                lookup.push(true);
+            }
+            // console.log('object',keyTriple.object);
+
+            return lookup[0] == lookup[1] == lookup[2]
+        });
+    } catch (error) {
+        console.error(error);
+    }
+    console.log('keyTriple',keyTriple,'matchedTriple',match);
+
+    return match
+}
+
+function cleanErrors(parsedTriples, validationResult){
+    var results = [];
+    var messages = [];
+    var errors = parseErrors(validationResult.errors);
+    console.log('errors',validationResult.errors);
+    //sometimes errors are in arrays of length one for some reason :/
+
+    console.log('errors',errors);
+    console.log('validationResult',validationResult);
+    for (var i = errors.length - 1; i >= 0; i--) {
+        if (errors[i].type == 'TypeMismatch'){
+            if (errors[i].triple) {
                 // if (errors[i].triple.object.type) {
                 //     errors[i].triple.object = errors[i].triple.object.value;
                 // }
-                console.log(errors[i].triple.subject,parsedTriples[2].subject,errors[i].triple.subject == parsedTriples[2].subject);
-                console.log(errors[i].triple.predicate,parsedTriples[2].predicate,errors[i].triple.predicate == parsedTriples[2].predicate);
-                console.log(errors[i].triple.object,parsedTriples[2].object,errors[i].triple.object == parsedTriples[2].object);
+                // console.log(errors[i].triple.subject,parsedTriples[2].subject,errors[i].triple.subject == parsedTriples[2].subject);
+                // console.log(errors[i].triple.predicate,parsedTriples[2].predicate,errors[i].triple.predicate == parsedTriples[2].predicate);
+                // console.log(errors[i].triple.object,parsedTriples[2].object,errors[i].triple.object == parsedTriples[2].object);
+
             try {
                 //shex validator gives object sometimes
-                
-                errors[i].line = parsedTriples.find(function (triple) { return triple.subject === errors[i].triple.subject &&
-                                                                            triple.predicate === errors[i].triple.predicate &&
-                                                                            triple.object === errors[i].triple.object; }).line;
-                errors[i].message = String(errors[i].type) + ' on line ' + String(errors[i].line);
+                var match = parsedTriples.find(function (triple) {
+                    var lookup = []
+                    if (typeof(errors[i].triple.subject) == 'string' ){
+                        if (triple.subject === errors[i].triple.subject){
+                            lookup.push(true)
+                        } else{
+                            return false
+                        }
+                    } else {
+                        lookup.push(true);
+                    }
+                    console.log('subject',errors[i].triple.subject);
+
+                    if (typeof(errors[i].triple.predicate) == 'string'){
+                        if (triple.predicate === errors[i].triple.predicate){
+                            lookup.push(true);
+                        } else {
+                            return false
+                        }
+                    }else {
+                        lookup.push(true);
+                    }
+                    
+                    console.log('predicate',errors[i].triple.predicate);
+                    
+                    if (typeof(errors[i].triple.object) == 'string'){
+                        if (triple.object === errors[i].triple.object){
+                            lookup.push(true);
+                        } else {
+                            return false
+                        }
+                    }else {
+                        lookup.push(true);
+                    }
+                    console.log('object',errors[i].triple.object);
+
+                    return lookup[0] == lookup[1] == lookup[2]
+                });
+                console.log('match',match);
+                errors[i].line = match.line;
+
+                errors[i].message = 'Type mismatch on line ' + String(errors[i].line) + ' in ' + String(validationResult.node);
             }
             catch(error){
                 console.error(error);
+                // errors[i].message = ' Missing property ' + String(errors[i].property) + ' in ' + String(validationResult.node);
             }
 
+            }
         }
-        else if (validationResult.type == 'MissingProperty') {
-            console.log('missing property error');
+
+        else if (errors[i].type == 'MissingProperty') {
+            try {
+                errors[i].message = ' Missing property ' + String(errors[i].property) ;
+
+            }catch (error){
+                console.error(error);
+            }
+            console.log('missing property error',errors[i]);
 
         }
         else {
-            console.log('VALIDATION ERROR:',errors.type);
+            console.log('VALIDATION ERROR:',errors[i].type);
         }
-        results.push(errors[i]);
+        //check if the same error has been already parsed, as the validation library does produce duplicates
+        if (!messages.includes(errors[i].message)){
+            results.push(errors[i]);
+            messages.push(errors[i].message);
+        }
     }
 
     return results
