@@ -24,29 +24,20 @@ Validator.prototype = {
     findShapes: function () {
         var _this = this;
         return Promise.all([this.schema, this.data]).then(function (a) {
-            console.log('showing shapes');
-            console.log(this.schema);
-            console.log(this.data);
+            // console.log('showing shapes');
+            // console.log(this.schema);
+            // console.log(this.data);
         });
     },
     validate: function(startingNodes) {
         var _this = this;
         console.log('validate function',_this);
         return Promise.all([this.schema, this.data, this.options]).then(function (a) {
-            console.log(a);
+            // console.log(a);
             var node = Object.keys(a[2].resourceShapeMap)[0];
             var result = shexjs.Validator.construct(a[0].schema).validate(a[1].db, node, a[2].resourceShapeMap[node]);
-            console.log('callbacks in validator',_this.callbacks);
-            console.log('db to validate',a[1].db)
-            // console.log('validation results:',result);
-            // return validator.validate(
-            //     a[0].schema,                       // Schema
-            //     a[0].resolver,
-            //     startingNodes,      // Starting Node
-            //     a[1].db,                       // db
-            //     a[1].resolver,
-            //     _this.options.closedShapes,
-            //     _this.callbacks.validationResult);
+            // console.log('callbacks in validator',_this.callbacks);
+            // console.log('db to validate',a[1].db)
             return cleanResult(result, a[1].triples, _this.callbacks.validationResult)
         });
     }
@@ -64,12 +55,12 @@ function parseData(dataText){
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
             // console.log('DB');
-            console.log('triple callback')
+            // console.log('triple callback')
             if (error) {
                 // throw Error("error parsing " + data + ": " + error);
                 reject(parseN3Error(error));
             } else if (triple) {
-                console.log("N3triple",triple);
+                // console.log("N3triple",triple);
                 lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
                 // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
                 db.addTriple(triple);
@@ -189,11 +180,11 @@ function parseErrors(errors){
     var results = [];
     for (var i = errors.length - 1; i >= 0; i--) {
         if (Array.isArray(errors[i])){
-            console.log('rec call',errors[i]);
+            // console.log('rec call',errors[i]);
             Array.prototype.push.apply(results,parseErrors(errors[i]));
 
         } else {
-            console.log('non rec call',errors[i]);
+            // console.log('non rec call',errors[i]);
             results.push(errors[i])
         }
     }
@@ -246,7 +237,7 @@ function matchTriple(parsedTriples, keyTriple){
     } catch (error) {
         console.error(error);
     }
-    console.log('keyTriple',keyTriple,'matchedTriple',match);
+    // console.log('keyTriple',keyTriple,'matchedTriple',match);
 
     return match
 }
@@ -255,71 +246,24 @@ function cleanErrors(parsedTriples, validationResult){
     var results = [];
     var messages = [];
     var errors = parseErrors(validationResult.errors);
-    console.log('errors',validationResult.errors);
+    // console.log('errors',validationResult.errors);
     //sometimes errors are in arrays of length one for some reason :/
 
-    console.log('errors',errors);
-    console.log('validationResult',validationResult);
+    // console.log('errors',errors);
+    // console.log('validationResult',validationResult);
     for (var i = errors.length - 1; i >= 0; i--) {
         if (errors[i].type == 'TypeMismatch'){
             if (errors[i].triple) {
-                // if (errors[i].triple.object.type) {
-                //     errors[i].triple.object = errors[i].triple.object.value;
-                // }
-                // console.log(errors[i].triple.subject,parsedTriples[2].subject,errors[i].triple.subject == parsedTriples[2].subject);
-                // console.log(errors[i].triple.predicate,parsedTriples[2].predicate,errors[i].triple.predicate == parsedTriples[2].predicate);
-                // console.log(errors[i].triple.object,parsedTriples[2].object,errors[i].triple.object == parsedTriples[2].object);
 
-            try {
-                //shex validator gives object sometimes
-                var match = parsedTriples.find(function (triple) {
-                    var lookup = []
-                    if (typeof(errors[i].triple.subject) == 'string' ){
-                        if (triple.subject === errors[i].triple.subject){
-                            lookup.push(true)
-                        } else{
-                            return false
-                        }
-                    } else {
-                        lookup.push(true);
-                    }
-                    console.log('subject',errors[i].triple.subject);
-
-                    if (typeof(errors[i].triple.predicate) == 'string'){
-                        if (triple.predicate === errors[i].triple.predicate){
-                            lookup.push(true);
-                        } else {
-                            return false
-                        }
-                    }else {
-                        lookup.push(true);
-                    }
-                    
-                    console.log('predicate',errors[i].triple.predicate);
-                    
-                    if (typeof(errors[i].triple.object) == 'string'){
-                        if (triple.object === errors[i].triple.object){
-                            lookup.push(true);
-                        } else {
-                            return false
-                        }
-                    }else {
-                        lookup.push(true);
-                    }
-                    console.log('object',errors[i].triple.object);
-
-                    return lookup[0] == lookup[1] == lookup[2]
-                });
-                console.log('match',match);
+                var match = matchTriple(parsedTriples,errors[i].triple);
+                // console.log('match',match);
                 errors[i].line = match.line;
 
                 errors[i].message = 'Type mismatch on line ' + String(errors[i].line) + ' in ' + String(validationResult.node);
-            }
-            catch(error){
-                console.error(error);
-                // errors[i].message = ' Missing property ' + String(errors[i].property) + ' in ' + String(validationResult.node);
-            }
 
+
+            } else {
+                errors[i].message = ' Missing property ' + String(errors[i].property) + ' in ' + String(validationResult.node);
             }
         }
 
@@ -330,7 +274,7 @@ function cleanErrors(parsedTriples, validationResult){
             }catch (error){
                 console.error(error);
             }
-            console.log('missing property error',errors[i]);
+            // console.log('missing property error',errors[i]);
 
         }
         else {
