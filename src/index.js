@@ -57,16 +57,16 @@ function parseData(dataText){
                 reject(parseN3Error(error));
             } else if (triple) {
                 // console.log("N3triple",triple);
-                lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
+                // lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
                 // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
-                db.addTriple(triple);
+                db.addTriple(triple.subject, triple.predicate, triple.object, {line:triple.line});
 
             } else {
                 var triples = db.getTriples();
-                for (var i = triples.length - 1; i >= 0; i--) {
-                    var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
-                    triples[i].line = lineIndex[triple_key];
-                }
+                // for (var i = triples.length - 1; i >= 0; i--) {
+                //     var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
+                //     triples[i].line = lineIndex[triple_key];
+                // }
                 resolve({db: db, triples:triples});
             }
         });

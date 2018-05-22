@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Parses and a ShEx schema and ShEx data file and validates the data against the schema.",
   "main": "src/index.js",
-  "scripts": {
-    "prepare": "patch-package"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/HW-SWeL/ShEx-validator"
@@ -27,5 +24,8 @@
     "mocha": "^2.2.1",
     "patch-package": "^5.1.1",
     "pegjs": "^0.8.0"
+  },
+  "scripts": {
+    "prepare": "patch-package"
   }
 }
