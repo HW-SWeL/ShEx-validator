@@ -59,7 +59,9 @@ function parseData(dataText){
                 // console.log("N3triple",triple);
                 // lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
                 // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
+                console.log('triple added ',triple);
                 db.addTriple(triple.subject, triple.predicate, triple.object, {line:triple.line});
+
 
             } else {
                 var triples = db.getTriples();
