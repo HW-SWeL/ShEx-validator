@@ -47,7 +47,7 @@ module.exports.Validator = Validator;
 function parseData(dataText){
     return new Promise(function (resolve, reject) {
         var lineIndex = new Object();
-        var db = n3.Store();
+        var db = n3.Store({meta:true});
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
             // console.log('DB');
