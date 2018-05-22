@@ -31,7 +31,6 @@ Validator.prototype = {
     },
     validate: function(startingNodes) {
         var _this = this;
-        console.log('validate function',_this);
         return Promise.all([this.schema, this.data, this.options]).then(function (a) {
             // console.log(a);
             var node = Object.keys(a[2].resourceShapeMap)[0];
@@ -46,9 +45,6 @@ Validator.prototype = {
 module.exports.Validator = Validator;
 
 function parseData(dataText){
-    console.log('split data');
-    console.log(dataText.split("\n"));
-    console.log('this',this);
     return new Promise(function (resolve, reject) {
         var lineIndex = new Object();
         var db = n3.Store();
@@ -78,16 +74,21 @@ function parseData(dataText){
     });
 }
 
+
+
 function parseSchema(base, schemaText) {
     return new Promise(function (resolve, reject) {
         var schema;
+
+        var preprocessed = parseReqLevels(schemaText);
+
         try {
-            schema = shexjs.Parser.construct(base).parse(schemaText);
+            schema = shexjs.Parser.construct(base).parse(preprocessed.data);
         }
         catch (e) {
             reject(e);
         }
-        resolve({schema: schema, shapes: schema.shapes});
+        resolve({schema: schema, shapes: schema.shapes, levels:preprocessed.lineRules});
 
     });
 };
@@ -289,3 +290,73 @@ function cleanErrors(parsedTriples, validationResult){
 
     return results
 }
+
+function parseReqLevels(rawSchema, levels){
+    var defaultLevels = ['`MUST`','`MAY`','`SHOULD`'];
+    var quoteChar = '`';
+    if (levels) {
+        defaultLevels = levels;
+        for (var i = levels.length - 1; i >= 0; i--) {
+            defaultLevels[i] = quoteChar + levels[i] + quoteChar;
+        }
+    }
+
+    
+    var lines = [];
+    var result = {'data':'',lineRules:{}};
+
+    lines = rawSchema.split("\n");
+
+    var re = new RegExp('(.*)('+defaultLevels[0]+'|'+defaultLevels[1]+'|'+defaultLevels[2]+')(.*)');
+
+    for (var i = 0; i <= lines.length - 1; i++) {
+        var match = lines[i].match(re);
+        if (match) {
+            result.lineRules[i] = match[2];
+            result.data = String.concat(result.data,match[3] + '\n');
+        } else {
+            result.data = String.concat(result.data,lines[i] + '\n');
+        }
+    }
+    console.log('PREPROCESSING OF schema DONE',result.data);
+    return result
+}
+
+var schemaText = 
+"# Issue-simple-annotated.shex - Issue representation in Turtle\n" + 
+"\n" + 
+"#BASE <http://base.example/#>\n" + 
+"PREFIX ex: <http://ex.example/#>\n" + 
+"PREFIX foaf: <http://xmlns.com/foaf/>\n" + 
+"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" + 
+"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
+"start = <IssueShape>  # Issue validation starts with <IssueShape>\n" + 
+"\n" + 
+"<IssueShape> {                       # An <IssueShape> has:\n" + 
+"    ex:state [ex:unassigned            # state which is\n" + 
+"              ex:assigned],            #   unassigned or assigned.\n" + 
+"    `MUST`ex:reportedBy @<UserShape>,        # reported by a <UserShape>.\n" + 
+"    ex:reportedOn xsd:dateTime,        # reported some date/time.\n" + 
+"    (                                  # optionally\n" + 
+"     ex:reproducedBy @<EmployeeShape>, #   reproduced by someone\n" + 
+"     ex:reproducedOn xsd:dateTime      #   at some data/time.\n" + 
+"    )?,\n" + 
+"    ex:related @<IssueShape>*          # n related issues.\n" + 
+"}\n" + 
+"\n" + 
+"<UserShape> {                        # A <UserShape> has:\n" + 
+"    (                                  # either\n" + 
+"       foaf:name xsd:string            #   a FOAF name\n" + 
+"     |                                 #  or\n" + 
+"       foaf:givenName xsd:string+,     #   one or more givenNames\n" + 
+"       foaf:familyName xsd:string),    #   and one familyName.\n" + 
+"    foaf:mbox IRI                      # one FOAF mbox.\n" + 
+"}\n" + 
+"\n" + 
+"<EmployeeShape> {                    # An <EmployeeShape> has:\n" + 
+"    `MUST`foaf:givenName xsd:string+,        # at least one givenName.\n" + 
+"    `MAY`foaf:familyName xsd:string,        # one familyName.\n" + 
+"    `SHOULD`foaf:phone IRI*,                   # any number of phone numbers.\n" + 
+"    foaf:mbox IRI                      # one FOAF mbox.\n" + 
+"}";
+
