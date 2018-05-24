@@ -329,12 +329,13 @@ function Validator(schemaText, dataText, callbacks, options) {
     this.callbacks = callbacks;
     this.options = options;
     
-    if (isNode) {
-        console.log("Running under Node.JS");
-        this.updateSchema('schema.shex', schemaText); 
-    } else {
-        this.updateSchema(location.origin + '/schema.shex', schemaText);
-    }
+    this.updateSchema('schema.shex', schemaText); 
+    // if (isNode) {
+    //     console.log("Running under Node.JS");
+    //     this.updateSchema('schema.shex', schemaText); 
+    // } else {
+    //     this.updateSchema(location.origin + '/schema.shex', schemaText);
+    // }
 
     this.updateData(dataText);
 }
