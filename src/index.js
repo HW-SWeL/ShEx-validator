@@ -329,7 +329,7 @@ function Validator(schemaText, dataText, callbacks, options) {
     this.callbacks = callbacks;
     this.options = options;
     
-    this.updateSchema('schema.shex', schemaText); 
+    // this.updateSchema('schema.shex', schemaText); 
     // if (isNode) {
     //     console.log("Running under Node.JS");
     //     this.updateSchema('schema.shex', schemaText); 
