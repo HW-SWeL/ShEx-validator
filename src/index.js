@@ -4,19 +4,7 @@ var n3 = require("n3");
 var isNode = require('detect-node');
 var DefaultBase = "";
 
-function Validator(schemaText, dataText, callbacks, options) {
-    this.callbacks = callbacks;
-    this.options = options;
-    
-    if (isNode) {
-        console.log("Running under Node.JS");
-        this.updateSchema('http://127.0.0.1:9999/schema.shex', schemaText);
-    } else {
-        this.updateSchema(location.origin + '/schema.shex', schemaText);
-    }
 
-    this.updateData(dataText);
-}
 
 Validator.prototype = {
     updateSchema: function (base, schemaText) {
@@ -54,8 +42,6 @@ Validator.prototype = {
         });
     }
 };
-
-module.exports.Validator = Validator;
 
 function parseData(dataText){
     return new Promise(function (resolve, reject) {
@@ -339,41 +325,18 @@ function parseReqLevels(rawSchema, levels){
     return result
 }
 
-var schemaText = 
-"# Issue-simple-annotated.shex - Issue representation in Turtle\n" + 
-"\n" + 
-"#BASE <http://base.example/#>\n" + 
-"PREFIX ex: <http://ex.example/#>\n" + 
-"PREFIX foaf: <http://xmlns.com/foaf/>\n" + 
-"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" + 
-"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + 
-"start = <IssueShape>  # Issue validation starts with <IssueShape>\n" + 
-"\n" + 
-"<IssueShape> {                       # An <IssueShape> has:\n" + 
-"    ex:state [ex:unassigned            # state which is\n" + 
-"              ex:assigned],            #   unassigned or assigned.\n" + 
-"    `MUST`ex:reportedBy @<UserShape>,        # reported by a <UserShape>.\n" + 
-"    ex:reportedOn xsd:dateTime,        # reported some date/time.\n" + 
-"    (                                  # optionally\n" + 
-"     ex:reproducedBy @<EmployeeShape>, #   reproduced by someone\n" + 
-"     ex:reproducedOn xsd:dateTime      #   at some data/time.\n" + 
-"    )?,\n" + 
-"    ex:related @<IssueShape>*          # n related issues.\n" + 
-"}\n" + 
-"\n" + 
-"<UserShape> {                        # A <UserShape> has:\n" + 
-"    (                                  # either\n" + 
-"       foaf:name xsd:string            #   a FOAF name\n" + 
-"     |                                 #  or\n" + 
-"       foaf:givenName xsd:string+,     #   one or more givenNames\n" + 
-"       foaf:familyName xsd:string),    #   and one familyName.\n" + 
-"    foaf:mbox IRI                      # one FOAF mbox.\n" + 
-"}\n" + 
-"\n" + 
-"<EmployeeShape> {                    # An <EmployeeShape> has:\n" + 
-"    `MUST`foaf:givenName xsd:string+,        # at least one givenName.\n" + 
-"    `MAY`foaf:familyName xsd:string,        # one familyName.\n" + 
-"    `SHOULD`foaf:phone IRI*,                   # any number of phone numbers.\n" + 
-"    foaf:mbox IRI                      # one FOAF mbox.\n" + 
-"}";
+function Validator(schemaText, dataText, callbacks, options) {
+    this.callbacks = callbacks;
+    this.options = options;
+    
+    if (isNode) {
+        console.log("Running under Node.JS");
+        this.updateSchema('http://127.0.0.1:9999/schema.shex', schemaText); 
+    } else {
+        this.updateSchema(location.origin + '/schema.shex', schemaText);
+    }
 
+    this.updateData(dataText);
+}
+
+module.exports.Validator = Validator;
