@@ -331,7 +331,7 @@ function Validator(schemaText, dataText, callbacks, options) {
     
     if (isNode) {
         console.log("Running under Node.JS");
-        this.updateSchema('http://127.0.0.1:9999/schema.shex', schemaText); 
+        this.updateSchema('schema.shex', schemaText); 
     } else {
         this.updateSchema(location.origin + '/schema.shex', schemaText);
     }
