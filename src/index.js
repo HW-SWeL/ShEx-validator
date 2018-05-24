@@ -32,9 +32,16 @@ Validator.prototype = {
     validate: function(startingNodes) {
         var _this = this;
         return Promise.all([this.schema, this.data, this.options]).then(function (a) {
-            // console.log(a);
+            console.log('validate called a:',a);
             var node = Object.keys(a[2].resourceShapeMap)[0];
-            var result = shexjs.Validator.construct(a[0].schema).validate(a[1].db, node, a[2].resourceShapeMap[node]);
+            var validator = shexjs.Validator.construct(a[0].schema);
+            try {
+                
+                var result = validator.validate(a[1].db, node, a[2].resourceShapeMap[node]);
+            } catch (error){
+                console.error(error);
+            }
+            console.log('valres',result);
             // console.log('callbacks in validator',_this.callbacks);
             // console.log('db to validate',a[1].db)
             return cleanResult(result, a[1].triples, _this.callbacks.validationResult)
@@ -57,18 +64,20 @@ function parseData(dataText){
                 reject(parseN3Error(error));
             } else if (triple) {
                 // console.log("N3triple",triple);
-                // lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
-                // lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
+                lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
+                lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
                 console.log('triple added ',triple);
-                db.addTriple(triple.subject, triple.predicate, triple.object, {line:triple.line});
+                db.addTriple(triple.subject, triple.predicate, triple.object,triple.graph, {line:triple.line});
 
 
             } else {
+                // db.setMetaFlag(true);
                 var triples = db.getTriples();
-                // for (var i = triples.length - 1; i >= 0; i--) {
-                //     var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
-                //     triples[i].line = lineIndex[triple_key];
-                // }
+                // db.setMetaFlag(false);
+                for (var i = triples.length - 1; i >= 0; i--) {
+                    var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
+                    triples[i].line = lineIndex[triple_key];
+                }
                 resolve({db: db, triples:triples});
             }
         });
