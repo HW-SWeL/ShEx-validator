@@ -1,14 +1,20 @@
 var Promise = require('promise');
 var shexjs = require("shex");
 var n3 = require("n3");
-
+var isNode = require('detect-node');
 var DefaultBase = "";
 
 function Validator(schemaText, dataText, callbacks, options) {
     this.callbacks = callbacks;
     this.options = options;
     
-    this.updateSchema(location.origin + '/schema.shex', schemaText);
+    if (isNode) {
+        console.log("Running under Node.JS");
+        this.updateSchema('http://127.0.0.1:9999/schema.shex', schemaText);
+    } else {
+        this.updateSchema(location.origin + '/schema.shex', schemaText);
+    }
+
     this.updateData(dataText);
 }
 
