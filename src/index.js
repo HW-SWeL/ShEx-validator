@@ -82,19 +82,47 @@ function parseData(dataText){
 function parseSchema(base, schemaText) {
     return new Promise(function (resolve, reject) {
         var schema;
-
-        var preprocessed = parseReqLevels(schemaText);
-
         try {
-            schema = shexjs.Parser.construct(base).parse(preprocessed.data);
+            schema = shexjs.Parser.construct(base).parse(schemaText);
         }
         catch (e) {
             reject(e);
         }
-        resolve({schema: schema, shapes: schema.shapes, levels:preprocessed.lineRules});
+        resolve({schema: schema, shapes: schema.shapes});
 
     });
 };
+
+function parseReqLevels(rawSchema, levels){
+    var defaultLevels = ['`MUST`','`MAY`','`SHOULD`'];
+    var quoteChar = '`';
+    if (levels) {
+        defaultLevels = levels;
+        for (var i = levels.length - 1; i >= 0; i--) {
+            defaultLevels[i] = quoteChar + levels[i] + quoteChar;
+        }
+    }
+
+    
+    var lines = [];
+    var result = {'data':'',lineRules:{}};
+
+    lines = rawSchema.split("\n");
+
+    var re = new RegExp('(.*)('+defaultLevels[0]+'|'+defaultLevels[1]+'|'+defaultLevels[2]+')(.*)');
+
+    for (var i = 0; i <= lines.length - 1; i++) {
+        var match = lines[i].match(re);
+        if (match) {
+            result.lineRules[i] = match[2];
+            result.data = String.concat(result.data,match[3] + '\n');
+        } else {
+            result.data = String.concat(result.data,lines[i] + '\n');
+        }
+    }
+    console.log('PREPROCESSING OF schema DONE',result.data);
+    return result
+}
 
 function cleanResult(result, parsedTriples, callback){
     console.log('validation result', result);
@@ -294,50 +322,23 @@ function cleanErrors(parsedTriples, validationResult){
     return results
 }
 
-function parseReqLevels(rawSchema, levels){
-    var defaultLevels = ['`MUST`','`MAY`','`SHOULD`'];
-    var quoteChar = '`';
-    if (levels) {
-        defaultLevels = levels;
-        for (var i = levels.length - 1; i >= 0; i--) {
-            defaultLevels[i] = quoteChar + levels[i] + quoteChar;
-        }
-    }
 
-    
-    var lines = [];
-    var result = {'data':'',lineRules:{}};
-
-    lines = rawSchema.split("\n");
-
-    var re = new RegExp('(.*)('+defaultLevels[0]+'|'+defaultLevels[1]+'|'+defaultLevels[2]+')(.*)');
-
-    for (var i = 0; i <= lines.length - 1; i++) {
-        var match = lines[i].match(re);
-        if (match) {
-            result.lineRules[i] = match[2];
-            result.data = String.concat(result.data,match[3] + '\n');
-        } else {
-            result.data = String.concat(result.data,lines[i] + '\n');
-        }
-    }
-    console.log('PREPROCESSING OF schema DONE',result.data);
-    return result
-}
 
 function Validator(schemaText, dataText, callbacks, options) {
+    console.log(this);
+
     this.callbacks = callbacks;
     this.options = options;
     
-    Validator.updateSchema('schema.shex', schemaText); 
+    this.updateSchema('schema.shex', schemaText); 
     if (isNode) {
         console.log("Running under Node.JS");
-        Validator.updateSchema('schema.shex', schemaText); 
+        this.updateSchema('schema.shex', schemaText); 
     } else {
-        Validator.updateSchema(location.origin + '/schema.shex', schemaText);
+        this.updateSchema(location.origin + '/schema.shex', schemaText);
     }
 
-    Validator.updateData(dataText);
+    this.updateData(dataText);
 }
 
 module.exports.Validator = Validator;
