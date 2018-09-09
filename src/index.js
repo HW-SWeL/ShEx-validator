@@ -31,7 +31,7 @@ Validator.prototype = {
             var validator = shexjs.Validator.construct(a[0].schema);
             try {
                 
-                var result = validator.validate(a[1].db, node, a[2].resourceShapeMap[node]);
+                var result = validator.validate(shex.Util.makeN3DB(a[1].db), node, a[2].resourceShapeMap[node]);
             } catch (error){
                 console.error(error);
             }
