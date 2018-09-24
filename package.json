@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/HW-SWeL/ShEx-validator"
   },
-  "scripts":{
+  "scripts": {
     "postinstall": "patch-package"
   },
   "author": "",
