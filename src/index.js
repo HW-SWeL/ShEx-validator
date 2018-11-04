@@ -63,8 +63,10 @@ function parseData(dataText){
             console.log(nquads);
             console.log(err);
             turtledata = nquads;
+            dataText = nquads;
           });
         }
+
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
             // console.log('DB');
