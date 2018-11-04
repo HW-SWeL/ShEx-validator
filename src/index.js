@@ -3,7 +3,7 @@ var shexjs = require("shex");
 var n3 = require("n3");
 var isNode = require('detect-node');
 var DefaultBase = "";
-// var isJson = require('is-json');
+var jsld = require('jsonld')
 
 
 
@@ -44,10 +44,27 @@ Validator.prototype = {
     }
 };
 
+function isJSON(str) {
+    try {
+        return (JSON.parse(str) && !!str);
+    } catch (e) {
+        return false;
+    }
+}
+
 function parseData(dataText){
     return new Promise(function (resolve, reject) {
         var lineIndex = new Object();
         var db = n3.Store({meta:true});
+        var turtledata = '';
+        if (isJSON(dataText)) {
+          print('json-ld passed to shex-validator');
+          jsld.toRDF(doc, {format: 'application/nquads'}, function(err, nquads) {
+            console.log(nquads);
+            console.log(err);
+            turtledata = nquads;
+          });
+        }
         n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
             // console.log('db', db);
             // console.log('DB');
@@ -71,7 +88,7 @@ function parseData(dataText){
                     var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
                     triples[i].line = lineIndex[triple_key];
                 }
-                resolve({db: db, triples:triples});
+                resolve({db: db, triples:triples, turtledata:turtledata});
             }
         });
 
