@@ -57,17 +57,20 @@ function parseData(dataText){
         var lineIndex = new Object();
         var db = n3.Store({meta:true});
         var turtledata = '';
+        var inputData = '';
         if (isJSON(dataText)) {
           print('json-ld passed to shex-validator');
           jsld.toRDF(dataText, {format: 'application/nquads'}, function(err, nquads) {
             console.log(nquads);
             console.log(err);
             turtledata = nquads;
-            dataText = nquads;
+            inputData = nquads;
           });
+        } else {
+          inputData = dataText;
         }
 
-        n3.Parser({documentIRI: DefaultBase}).parse(dataText, function (error, triple, prefixes) {
+        n3.Parser({documentIRI: DefaultBase}).parse(inputData, function (error, triple, prefixes) {
             // console.log('db', db);
             // console.log('DB');
             // console.log('triple callback')
