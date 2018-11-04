@@ -59,7 +59,7 @@ function parseData(dataText){
         var turtledata = '';
         var inputData = '';
         if (isJSON(dataText)) {
-          print('json-ld passed to shex-validator');
+          console.log('json-ld passed to shex-validator');
           var doc = JSON.parse(dataText);
           jsld.toRDF(doc, {format: 'application/nquads'}, function(err, nquads) {
             console.log(nquads);
