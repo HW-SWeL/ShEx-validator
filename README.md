@@ -1,6 +1,6 @@
 # ShEx-validator [![Build Status](https://travis-ci.org/HW-SWeL/ShEx-validator.svg?branch=master)](https://travis-ci.org/HW-SWeL/ShEx-validator)
 
-Parses and a ShEx schema and RDF data file and validates the resources in the data against the shapes in the schema.
+Parses a ShEx schema and RDF data file and validates the resources in the data against the shapes in the schema.
 
 A standalone Node module with a command line interface and validate() function as described below
 
