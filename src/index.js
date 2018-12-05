@@ -52,6 +52,33 @@ function isJSON(str) {
     }
 }
 
+function parseN3Data(inputData, turtledata, db, lineIndex, resolve, reject){
+  n3.Parser({documentIRI: DefaultBase}).parse(inputData, function (error, triple, prefixes) {
+      // console.log('db', db);
+      // console.log('DB');
+      // console.log('triple callback')
+      if (error) {
+          // throw Error("error parsing " + data + ": " + error);
+          reject(parseN3Error(error));
+      } else if (triple) {
+          // console.log("N3triple",triple);
+          lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
+          lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
+          console.log('triple added ',triple);
+          db.addTriple(triple.subject, triple.predicate, triple.object,triple.graph, {line:triple.line});
+      } else {
+          // db.setMetaFlag(true);
+          var triples = db.getTriples();
+          // db.setMetaFlag(false);
+          for (var i = triples.length - 1; i >= 0; i--) {
+              var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
+              triples[i].line = lineIndex[triple_key];
+          }
+          resolve({db: db, triples:triples, turtledata:turtledata});
+      }
+  });
+}
+
 function parseData(dataText){
     return new Promise(function (resolve, reject) {
         var lineIndex = new Object();
@@ -66,43 +93,14 @@ function parseData(dataText){
             console.log(err);
             turtledata = nquads;
             inputData = nquads;
+            parseN3Data(inputData, turtledata, db, lineIndex, resolve, reject);
           });
         } else {
           inputData = dataText;
+          parseN3Data(inputData, turtledata, db, lineIndex, resolve, reject);
         }
-
-        n3.Parser({documentIRI: DefaultBase}).parse(inputData, function (error, triple, prefixes) {
-            // console.log('db', db);
-            // console.log('DB');
-            // console.log('triple callback')
-            if (error) {
-                // throw Error("error parsing " + data + ": " + error);
-                reject(parseN3Error(error));
-            } else if (triple) {
-                // console.log("N3triple",triple);
-                lineIndex[JSON.stringify({'subject':triple.subject,'predicate':triple.predicate,'object':triple.object,'graph':triple.graph})] = triple.line;
-                lineIndex[triple.line] = {'object':triple.object,'subject':triple.subject,'predicate':triple.predicate,'graph':triple.graph};
-                console.log('triple added ',triple);
-                db.addTriple(triple.subject, triple.predicate, triple.object,triple.graph, {line:triple.line});
-
-
-            } else {
-                // db.setMetaFlag(true);
-                var triples = db.getTriples();
-                // db.setMetaFlag(false);
-                for (var i = triples.length - 1; i >= 0; i--) {
-                    var triple_key = JSON.stringify({'subject':triples[i].subject,'predicate':triples[i].predicate,'object':triples[i].object,'graph':""});
-                    triples[i].line = lineIndex[triple_key];
-                }
-                resolve({db: db, triples:triples, turtledata:turtledata});
-            }
-        });
-
-
-
     });
 }
-
 
 
 function parseSchema(base, schemaText) {
